@@ -23,3 +23,8 @@ var (
 	osDistro distro
 	osVer    string
 )
+
+const (
+	TmuxSessionForSteam = "dstm-install-steam"
+	TmuxSessionForDST   = "dstm-install-dst"
+)
