@@ -57,10 +57,20 @@ func Execute() {
 	}
 }
 
+var (
+	steamRoot = ""
+	dstRoot   = ""
+	betaName  = ""
+)
+
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
 
 	rootCmd.PersistentFlags().Bool("debug", false, "print debug messages")
+
+	rootCmd.PersistentFlags().StringVar(&steamRoot, "steam-root", "", "steam root directory")
+	rootCmd.PersistentFlags().StringVar(&dstRoot, "dst-root", "", "dst server root directory")
+	rootCmd.PersistentFlags().StringVar(&betaName, "beta", "", "name of dst server beta version")
 }

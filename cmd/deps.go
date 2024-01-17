@@ -69,7 +69,7 @@ var depsCmd = &cobra.Command{
 
 		checkSteamRoot := func() {
 			if steamRoot == "" {
-				slog.Error("Steam root path is empty")
+				slog.Error("Please use --steam-root flag to specify steam root directory")
 				os.Exit(1)
 			}
 		}
@@ -108,7 +108,7 @@ var depsCmd = &cobra.Command{
 
 		checkDSTRoot := func() {
 			if dstRoot == "" {
-				slog.Error("DST root path is empty")
+				slog.Error("Please use --dst-root flag to specify dst root directory")
 				os.Exit(1)
 			}
 		}
@@ -168,17 +168,12 @@ var (
 	isInstallPkg   bool
 	isInstallSteam bool
 	isInstallDST   bool
-
-	steamRoot = ""
-	dstRoot   = ""
-	betaName  = ""
 )
 
 func init() {
 	rootCmd.AddCommand(depsCmd)
 
 	depsCmd.Flags().BoolVarP(&isList, "list", "l", false, "list required packages")
-
 	depsCmd.Flags().BoolVarP(&isInstallAll, "install", "i", false, "install packages & steam & dst server")
 	depsCmd.Flags().BoolVar(&isInstallPkg, "install-pkg", false, "install specified packages, or all required packages if not specified")
 	depsCmd.Flags().BoolVar(&isInstallSteam, "install-steam", false, "install or update steam")
@@ -186,8 +181,4 @@ func init() {
 
 	depsCmd.MarkFlagsOneRequired("list", "install", "install-pkg", "install-steam", "install-dst")
 	depsCmd.MarkFlagsMutuallyExclusive("list", "install", "install-pkg", "install-steam", "install-dst")
-
-	depsCmd.Flags().StringVar(&steamRoot, "steam-root", "", "steam root directory")
-	depsCmd.Flags().StringVar(&dstRoot, "dst-root", "", "dst server root directory")
-	depsCmd.Flags().StringVar(&betaName, "beta", "", "dst server beta name")
 }
