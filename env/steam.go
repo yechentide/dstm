@@ -20,7 +20,7 @@ func steamScriptExists(steamRoot string) (bool, error) {
 
 func downloadSteamScript(steamRoot string) error {
 	rootPath := utils.ExpandPath(steamRoot)
-	err := utils.MkDir(rootPath, 0755, true)
+	err := utils.MkDirIfNotExists(rootPath, 0755, true)
 	if err != nil {
 		return err
 	}

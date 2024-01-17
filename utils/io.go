@@ -1,29 +1,13 @@
 package utils
 
 import (
+	"errors"
 	"io"
 	"io/fs"
 	"net/http"
 	"os"
 	"strings"
 )
-
-func DownloadFile(filepath string, url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	return err
-}
 
 func ExpandPath(path string) string {
 	p := os.ExpandEnv(path)
@@ -33,28 +17,79 @@ func ExpandPath(path string) string {
 	return p
 }
 
+func DownloadFile(filepath string, url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	p := ExpandPath(filepath)
+	out, err := os.Create(p)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
 func FileExists(path string) (bool, error) {
 	p := ExpandPath(path)
-	if _, err := os.Stat(p); err != nil {
+	f, err := os.Stat(p)
+	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
+		} else {
+			return false, err
 		}
-		return false, err
+	}
+	if f.IsDir() {
+		return false, errors.New("file is a directory: " + p)
 	}
 	return true, nil
 }
 
-func MkDir(path string, perm fs.FileMode, recursive bool) error {
-	exists, err := FileExists(path)
+func DirExists(path string) (bool, error) {
+	p := ExpandPath(path)
+	f, err := os.Stat(p)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+	if !f.IsDir() {
+		return false, errors.New("file is not a directory: " + p)
+	}
+	return true, nil
+}
+
+func MkDirIfNotExists(path string, perm fs.FileMode, recursive bool) error {
+	p := ExpandPath(path)
+	exists, err := DirExists(p)
 	if err != nil {
 		return err
 	}
 	if exists {
 		return nil
 	}
-	p := ExpandPath(path)
 	if recursive {
-		return os.MkdirAll(p, 0755)
+		return os.MkdirAll(p, perm)
 	}
-	return os.Mkdir(p, 0755)
+	return os.Mkdir(p, perm)
+}
+
+func DelDirIfExists(path string) error {
+	p := ExpandPath(path)
+	exists, err := DirExists(p)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return nil
+	}
+	return os.RemoveAll(p)
 }
