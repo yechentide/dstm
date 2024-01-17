@@ -22,9 +22,11 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"log/slog"
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/yechentide/dstm/global"
 )
 
 var rootCmd = &cobra.Command{
@@ -32,6 +34,17 @@ var rootCmd = &cobra.Command{
 	Version: "v0.0.1",
 	Short:   "Tools for Don't Starve Together Dedicated Server",
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		global.SetDefaultLogger()
+		isDebug, err := cmd.Flags().GetBool("debug")
+		if err != nil {
+			slog.Error("Failed to get debug flag", err)
+			return
+		}
+		if isDebug {
+			global.UpdateLogLevel(slog.LevelDebug)
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 	},
@@ -48,4 +61,6 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
+
+	rootCmd.PersistentFlags().Bool("debug", false, "print debug messages")
 }
