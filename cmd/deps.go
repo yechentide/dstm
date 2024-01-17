@@ -135,12 +135,13 @@ var depsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			checkDSTRoot()
-			err := env.PrepareLatestDSTServer(steamRoot, dstRoot, betaName)
+			serverRoot := dstRoot + "Server"
+			err := env.PrepareLatestDSTServer(steamRoot, serverRoot, betaName)
 			if err != nil {
 				slog.Error("Failed to prepare dst server", err)
 				os.Exit(1)
 			}
-			dstOK := waitForCompletion(env.TmuxSessionForDST, checkDSTAvailable(dstRoot))
+			dstOK := waitForCompletion(env.TmuxSessionForDST, checkDSTAvailable(serverRoot))
 			if !dstOK {
 				slog.Error("DST installation failed")
 				os.Exit(1)
