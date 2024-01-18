@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/extractor"
-	"github.com/yechentide/dstm/utils"
 )
 
 var extractCmd = &cobra.Command{
@@ -20,16 +19,18 @@ var extractCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		serverRoot := viper.GetString("serverRoot")
 		if serverRoot == "" {
-			slog.Error("Please use --dst-root flag to specify dst root directory")
+			slog.Error("Please use --server-root flag or config file to specify dst server root directory")
 			os.Exit(1)
 		}
-		zipFile := utils.ExpandPath(serverRoot) + "/data/databundles/scripts.zip"
-		tmpDir, err := cmd.Flags().GetString("output")
-		if err != nil || tmpDir == "" {
-			slog.Error("Please use --output flag to specify output directory")
-			os.Exit(1)
+		zipFile := serverRoot + "/data/databundles/scripts.zip"
+
+		outputDir := viper.GetString("cacheDir") + "/json"
+		specifiedDir, err := cmd.Flags().GetString("output")
+		if err == nil && specifiedDir != "" {
+			outputDir = specifiedDir
 		}
-		extractor.ExtractSettings(zipFile, tmpDir)
+
+		extractor.ExtractSettings(zipFile, outputDir)
 	},
 }
 

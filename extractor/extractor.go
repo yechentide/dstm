@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,17 +18,23 @@ import (
 //go:embed scripts
 var scriptsDir embed.FS
 
-func ExtractSettings(zipFile, tmpDir string) error {
+func ExtractSettings(zipFile, outputDir string) error {
 	zipFilePath := utils.ExpandPath(zipFile)
-	tmpDirPath := utils.ExpandPath(tmpDir)
+	tmpDir := "/tmp/dstm-extract-json"
+	scriptDir := tmpDir + "/scripts"
+	workDir := tmpDir + "/work"
 
-	err := prepareFiles(zipFilePath, tmpDirPath)
+	err := utils.DelDirIfExists(tmpDir)
 	if err != nil {
 		return err
 	}
 
-	workDir := tmpDirPath + "/work"
-	outputDir := tmpDirPath + "/output"
+	err = prepareFiles(zipFilePath, tmpDir, scriptDir, workDir)
+	if err != nil {
+		return err
+	}
+
+	outputDir = utils.ExpandPath(outputDir)
 	return executeLuaScriptToExtractSettings(workDir, outputDir)
 }
 
@@ -37,6 +44,7 @@ func executeLuaScriptToExtractSettings(workDir, outputDir string) error {
 		return err
 	}
 
+	slog.Info("Extracting cluster json settings ...")
 	sessionName := "dstm-extract-settings"
 	cmd := "cd '" + workDir + "' && lua ./main.lua '" + workDir + "/languages' '" + outputDir + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
@@ -60,27 +68,24 @@ func executeLuaScriptToExtractSettings(workDir, outputDir string) error {
 	if !exists {
 		return errors.New("failed to extract settings")
 	}
+	slog.Info("Cluster json settings extracted to " + outputDir)
 	return nil
 }
 
-func prepareFiles(zipFile, tmpDir string) error {
+func prepareFiles(zipFile, tmpDir, scriptDir, destDir string) error {
+	slog.Info("Unzipping scripts to " + tmpDir)
 	err := utils.Unzip(zipFile, tmpDir, 0755)
 	if err != nil {
 		return err
 	}
 
-	workDir := tmpDir + "/work"
-	err = utils.MkDirIfNotExists(workDir, 0755, true)
+	slog.Info("Copying scripts ...")
+	err = copyParserAndMocks(destDir)
 	if err != nil {
 		panic(err)
 	}
 
-	err = copyParserAndMocks(tmpDir)
-	if err != nil {
-		panic(err)
-	}
-
-	err = copyServerFiles(tmpDir)
+	err = copyServerFiles(scriptDir, destDir)
 	if err != nil {
 		panic(err)
 	}
@@ -88,12 +93,9 @@ func prepareFiles(zipFile, tmpDir string) error {
 	return nil
 }
 
-func copyParserAndMocks(tmpDir string) error {
+func copyParserAndMocks(destDir string) error {
 	err := fs.WalkDir(scriptsDir, "scripts", func(path string, d fs.DirEntry, err error) error {
-		if d.Name() == "scripts" {
-			return nil
-		}
-		destPath := strings.Replace(path, "scripts", tmpDir+"/work", 1)
+		destPath := strings.Replace(path, "scripts", destDir, 1)
 		if d.IsDir() {
 			return utils.MkDirIfNotExists(destPath, 0755, true)
 		} else {
@@ -112,42 +114,42 @@ func copyParserAndMocks(tmpDir string) error {
 	return err
 }
 
-func copyServerFiles(tmpDir string) error {
+func copyServerFiles(scriptDir, destDir string) error {
 	targetDirs := []string{
-		tmpDir + "/scripts/languages",
-		tmpDir + "/scripts/map/levels",
-		tmpDir + "/scripts/map/tasksets",
+		scriptDir + "/languages",
+		scriptDir + "/map/levels",
+		scriptDir + "/map/tasksets",
 	}
 	targetFiles := []string{
-		tmpDir + "/scripts/map/customize.lua",
-		tmpDir + "/scripts/map/level.lua",
-		tmpDir + "/scripts/map/levels.lua",
-		tmpDir + "/scripts/map/locations.lua",
-		tmpDir + "/scripts/map/resource_substitution.lua",
-		tmpDir + "/scripts/map/settings.lua",
-		tmpDir + "/scripts/map/startlocations.lua",
-		tmpDir + "/scripts/map/tasksets.lua",
+		scriptDir + "/map/customize.lua",
+		scriptDir + "/map/level.lua",
+		scriptDir + "/map/levels.lua",
+		scriptDir + "/map/locations.lua",
+		scriptDir + "/map/resource_substitution.lua",
+		scriptDir + "/map/settings.lua",
+		scriptDir + "/map/startlocations.lua",
+		scriptDir + "/map/tasksets.lua",
 
-		tmpDir + "/scripts/constants.lua",
-		tmpDir + "/scripts/strings.lua",
+		scriptDir + "/constants.lua",
+		scriptDir + "/strings.lua",
 
-		tmpDir + "/scripts/class.lua",
-		tmpDir + "/scripts/strict.lua",
-		tmpDir + "/scripts/translator.lua",
+		scriptDir + "/class.lua",
+		scriptDir + "/strict.lua",
+		scriptDir + "/translator.lua",
 
-		tmpDir + "/scripts/beefalo_clothing.lua",
-		tmpDir + "/scripts/clothing.lua",
-		tmpDir + "/scripts/emote_items.lua",
-		tmpDir + "/scripts/item_blacklist.lua",
-		tmpDir + "/scripts/misc_items.lua",
-		tmpDir + "/scripts/prefabskins.lua",
-		tmpDir + "/scripts/skin_strings.lua",
-		tmpDir + "/scripts/techtree.lua",
-		tmpDir + "/scripts/tuning.lua",
-		tmpDir + "/scripts/worldsettings_overrides.lua",
+		scriptDir + "/beefalo_clothing.lua",
+		scriptDir + "/clothing.lua",
+		scriptDir + "/emote_items.lua",
+		scriptDir + "/item_blacklist.lua",
+		scriptDir + "/misc_items.lua",
+		scriptDir + "/prefabskins.lua",
+		scriptDir + "/skin_strings.lua",
+		scriptDir + "/techtree.lua",
+		scriptDir + "/tuning.lua",
+		scriptDir + "/worldsettings_overrides.lua",
 	}
 	targetPatterns := []string{
-		tmpDir + "/scripts/speech_*.lua",
+		scriptDir + "/speech_*.lua",
 	}
 	for _, pattern := range targetPatterns {
 		pathList, err := filepath.Glob(pattern)
@@ -158,14 +160,14 @@ func copyServerFiles(tmpDir string) error {
 	}
 
 	for _, dirPath := range targetDirs {
-		dest := strings.Replace(dirPath, tmpDir+"/scripts", tmpDir+"/work", 1)
+		dest := strings.Replace(dirPath, scriptDir, destDir, 1)
 		err := utils.CopyDir(dirPath, dest)
 		if err != nil {
 			panic(err)
 		}
 	}
 	for _, filePath := range targetFiles {
-		dest := strings.Replace(filePath, tmpDir+"/scripts", tmpDir+"/work", 1)
+		dest := strings.Replace(filePath, scriptDir, destDir, 1)
 		err := utils.CopyFile(filePath, dest)
 		if err != nil {
 			panic(err)
