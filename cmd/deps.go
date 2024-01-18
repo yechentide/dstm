@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/env"
 	"github.com/yechentide/dstm/shell"
 )
@@ -67,6 +68,9 @@ var depsCmd = &cobra.Command{
 			return checkFunc()
 		}
 
+		steamRoot := viper.GetString("steamRoot")
+		serverRoot := viper.GetString("serverRoot")
+
 		checkSteamRoot := func() {
 			if steamRoot == "" {
 				slog.Error("Please use --steam-root flag to specify steam root directory")
@@ -107,7 +111,7 @@ var depsCmd = &cobra.Command{
 		}
 
 		checkDSTRoot := func() {
-			if dstRoot == "" {
+			if serverRoot == "" {
 				slog.Error("Please use --dst-root flag to specify dst root directory")
 				os.Exit(1)
 			}
@@ -135,8 +139,7 @@ var depsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 			checkDSTRoot()
-			serverRoot := dstRoot + "Server"
-			err := env.PrepareLatestDSTServer(steamRoot, serverRoot, betaName)
+			err := env.PrepareLatestDSTServer(steamRoot, serverRoot, "")
 			if err != nil {
 				slog.Error("Failed to prepare dst server", err)
 				os.Exit(1)

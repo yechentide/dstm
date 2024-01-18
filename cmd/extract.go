@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/extractor"
 	"github.com/yechentide/dstm/utils"
 )
@@ -17,11 +18,12 @@ var extractCmd = &cobra.Command{
 	Short: "Extract cluster settings in JSON",
 	Long:  "Extract cluster settings in JSON format from dst server files",
 	Run: func(cmd *cobra.Command, args []string) {
-		if dstRoot == "" {
+		serverRoot := viper.GetString("serverRoot")
+		if serverRoot == "" {
 			slog.Error("Please use --dst-root flag to specify dst root directory")
 			os.Exit(1)
 		}
-		zipFile := utils.ExpandPath(dstRoot) + "/Server/data/databundles/scripts.zip"
+		zipFile := utils.ExpandPath(serverRoot) + "/data/databundles/scripts.zip"
 		tmpDir, err := cmd.Flags().GetString("output")
 		if err != nil || tmpDir == "" {
 			slog.Error("Please use --output flag to specify output directory")

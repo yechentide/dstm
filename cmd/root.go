@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/global"
 )
 
@@ -36,14 +37,6 @@ var rootCmd = &cobra.Command{
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		global.SetDefaultLogger()
-		isDebug, err := cmd.Flags().GetBool("debug")
-		if err != nil {
-			slog.Error("Failed to get debug flag", err)
-			return
-		}
-		if isDebug {
-			global.UpdateLogLevel(slog.LevelDebug)
-		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
@@ -57,20 +50,55 @@ func Execute() {
 	}
 }
 
-var (
-	steamRoot = ""
-	dstRoot   = ""
-	betaName  = ""
-)
-
 func init() {
+	// Flow: rootCmd.Execute --> flags processing --> cobra.OnInitialize --> rootCmd.Run
+	cobra.OnInitialize(initConfig)
+
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
 
-	rootCmd.PersistentFlags().Bool("debug", false, "print debug messages")
+	rootCmd.PersistentFlags().String("log-level", "info", "change log error")
+	viper.BindPFlag("logLevel", rootCmd.PersistentFlags().Lookup("log-level"))
 
-	rootCmd.PersistentFlags().StringVar(&steamRoot, "steam-root", "", "steam root directory")
-	rootCmd.PersistentFlags().StringVar(&dstRoot, "dst-root", "", "dst server root directory")
-	rootCmd.PersistentFlags().StringVar(&betaName, "beta", "", "name of dst server beta version")
+	rootCmd.PersistentFlags().String("cache-dir", "$HOME/.cache/dstm", "cache directory")
+	viper.BindPFlag("cacheDir", rootCmd.PersistentFlags().Lookup("cache-dir"))
+
+	rootCmd.PersistentFlags().String("steam-root", "$HOME/Steam", "steam root directory")
+	viper.BindPFlag("steamRoot", rootCmd.PersistentFlags().Lookup("steam-root"))
+
+	rootCmd.PersistentFlags().String("server-root", "$HOME/DST/Server", "dst server root directory")
+	viper.BindPFlag("serverRoot", rootCmd.PersistentFlags().Lookup("server-root"))
+
+	rootCmd.PersistentFlags().String("data-root", "$HOME/DST/Klei", "dst save data root directory")
+	viper.BindPFlag("dataRoot", rootCmd.PersistentFlags().Lookup("data-root"))
+}
+
+func initConfig() {
+	viper.SetDefault("logLevel", "info")
+	viper.SetDefault("cacheDir", "$HOME/.cache/dstm")
+	viper.SetDefault("steamRoot", "$HOME/Steam")
+	viper.SetDefault("serverRoot", "$HOME/DST/Server")
+	viper.SetDefault("dataRoot", "$HOME/DST/Klei")
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+
+	// search paths
+	xdgConfigHome := os.Getenv("XDG_CONFIG_HOME")
+	if xdgConfigHome != "" {
+		viper.AddConfigPath(xdgConfigHome + "/dstm")
+	}
+	viper.AddConfigPath("$HOME/.dstm")
+	viper.AddConfigPath(".")
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error if desired
+			slog.Warn("Config file not found")
+		} else {
+			// Config file was found but another error was produced
+			slog.Error("Failed to read config file", "error", err)
+		}
+	}
 }
