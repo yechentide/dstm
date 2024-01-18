@@ -73,7 +73,7 @@ var depsCmd = &cobra.Command{
 
 		checkSteamRoot := func() {
 			if steamRoot == "" {
-				slog.Error("Please use --steam-root flag to specify steam root directory")
+				slog.Error("Please use --steam-root flag or config file to specify steam root directory")
 				os.Exit(1)
 			}
 		}
@@ -110,15 +110,15 @@ var depsCmd = &cobra.Command{
 			os.Exit(0)
 		}
 
-		checkDSTRoot := func() {
+		checkServerRoot := func() {
 			if serverRoot == "" {
-				slog.Error("Please use --dst-root flag to specify dst root directory")
+				slog.Error("Please use --server-root flag or config file to specify dst root directory")
 				os.Exit(1)
 			}
 		}
-		checkDSTAvailable := func(dstRoot string) func() bool {
+		checkDSTAvailable := func(serverRoot string) func() bool {
 			return func() bool {
-				dstOK, err := env.IsDSTServerAvailable(dstRoot)
+				dstOK, err := env.IsDSTServerAvailable(serverRoot)
 				if err != nil {
 					slog.Error("Failed to check dst availability", err)
 					os.Exit(1)
@@ -138,7 +138,7 @@ var depsCmd = &cobra.Command{
 				slog.Error("Steam installation failed")
 				os.Exit(1)
 			}
-			checkDSTRoot()
+			checkServerRoot()
 			err := env.PrepareLatestDSTServer(steamRoot, serverRoot, "")
 			if err != nil {
 				slog.Error("Failed to prepare dst server", err)
