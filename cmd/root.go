@@ -72,6 +72,9 @@ func init() {
 
 	rootCmd.PersistentFlags().String("data-root", "$HOME/DST/Klei", "dst save data root directory")
 	viper.BindPFlag("dataRoot", rootCmd.PersistentFlags().Lookup("data-root"))
+
+	rootCmd.PersistentFlags().String("separator", "-", "tmux session name separator")
+	viper.BindPFlag("separator", rootCmd.PersistentFlags().Lookup("separator"))
 }
 
 func initConfig() {
@@ -80,6 +83,7 @@ func initConfig() {
 	viper.SetDefault("steamRoot", "$HOME/Steam")
 	viper.SetDefault("serverRoot", "$HOME/DST/Server")
 	viper.SetDefault("dataRoot", "$HOME/DST/Klei")
+	viper.SetDefault("separator", "-")
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")

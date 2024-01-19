@@ -4,3 +4,5 @@ cacheDir = "$HOME/.cache/dstm"
 steamRoot = "$HOME/Steam"
 serverRoot = "$HOME/DST/Server"
 dataRoot = "$HOME/DST/Klei"
+
+separator = "-"
