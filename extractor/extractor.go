@@ -3,6 +3,7 @@ package extractor
 import (
 	"embed"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"log/slog"
@@ -18,7 +19,11 @@ import (
 //go:embed scripts
 var scriptsDir embed.FS
 
-func ExtractSettings(zipFile, outputDir string) error {
+func ExtractSettings(serverRoot, outputDir string) error {
+	serverRoot = utils.ExpandPath(serverRoot)
+	serverVersion := getServerVersion(serverRoot)
+
+	zipFile := serverRoot + "/data/databundles/scripts.zip"
 	zipFilePath := utils.ExpandPath(zipFile)
 	tmpDir := "/tmp/dstm-extract-json"
 	scriptDir := tmpDir + "/scripts"
@@ -35,10 +40,24 @@ func ExtractSettings(zipFile, outputDir string) error {
 	}
 
 	outputDir = utils.ExpandPath(outputDir)
-	return executeLuaScriptToExtractSettings(workDir, outputDir)
+	return executeLuaScriptToExtractSettings(workDir, outputDir, serverVersion)
 }
 
-func executeLuaScriptToExtractSettings(workDir, outputDir string) error {
+func getServerVersion(serverRoot string) string {
+	versionFile := serverRoot + "/version.txt"
+	fmt.Println(versionFile)
+	exists, err := utils.FileExists(versionFile)
+	if err != nil || !exists {
+		return ""
+	}
+	data, err := os.ReadFile(versionFile)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(data))
+}
+
+func executeLuaScriptToExtractSettings(workDir, outputDir, serverVersion string) error {
 	err := utils.MkDirIfNotExists(outputDir, 0755, true)
 	if err != nil {
 		return err
@@ -46,7 +65,7 @@ func executeLuaScriptToExtractSettings(workDir, outputDir string) error {
 
 	slog.Info("Extracting cluster json settings ...")
 	sessionName := "dstm-extract-settings"
-	cmd := "cd '" + workDir + "' && lua ./main.lua '" + workDir + "/languages' '" + outputDir + "'"
+	cmd := "cd '" + workDir + "' && lua ./main.lua '" + outputDir + "' '" + serverVersion + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {
 		return err

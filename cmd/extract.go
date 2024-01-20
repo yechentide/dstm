@@ -19,7 +19,6 @@ var extractCmd = &cobra.Command{
 			slog.Error("Please use --server-root flag or config file to specify dst server root directory")
 			os.Exit(1)
 		}
-		zipFile := serverRoot + "/data/databundles/scripts.zip"
 
 		outputDir := viper.GetString("cacheDir") + "/json"
 		specifiedDir, err := cmd.Flags().GetString("output")
@@ -27,7 +26,7 @@ var extractCmd = &cobra.Command{
 			outputDir = specifiedDir
 		}
 
-		extractor.ExtractSettings(zipFile, outputDir)
+		extractor.ExtractSettings(serverRoot, outputDir)
 	},
 }
 
