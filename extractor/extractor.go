@@ -16,7 +16,7 @@ import (
 	"github.com/yechentide/dstm/utils"
 )
 
-//go:embed scripts
+//go:embed worldgen_template
 var scriptsDir embed.FS
 
 func ExtractSettings(serverRoot, outputDir string) error {
@@ -113,8 +113,8 @@ func prepareFiles(zipFile, tmpDir, scriptDir, destDir string) error {
 }
 
 func copyParserAndMocks(destDir string) error {
-	err := fs.WalkDir(scriptsDir, "scripts", func(path string, d fs.DirEntry, err error) error {
-		destPath := strings.Replace(path, "scripts", destDir, 1)
+	err := fs.WalkDir(scriptsDir, "worldgen_template", func(path string, d fs.DirEntry, err error) error {
+		destPath := strings.Replace(path, "worldgen_template", destDir, 1)
 		if d.IsDir() {
 			return utils.MkDirIfNotExists(destPath, 0755, true)
 		} else {
