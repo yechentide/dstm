@@ -95,6 +95,25 @@ func DelDirIfExists(path string) error {
 	return os.RemoveAll(p)
 }
 
+func RemakeDir(path string, perm fs.FileMode, recursive bool) error {
+	err := DelDirIfExists(path)
+	if err != nil {
+		return err
+	}
+	return MkDirIfNotExists(path, perm, recursive)
+}
+
+func WriteToFile(content, destPath string) error {
+	destFile, err := os.Create(ExpandPath(destPath))
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.WriteString(destFile, content)
+	return err
+}
+
 func CopyFile(src, dest string) error {
 	srcFile, err := os.Open(ExpandPath(src))
 	if err != nil {
