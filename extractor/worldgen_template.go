@@ -25,7 +25,7 @@ func ExtractSettings(serverRoot, outputDir string) error {
 
 	zipFile := serverRoot + "/data/databundles/scripts.zip"
 	zipFilePath := utils.ExpandPath(zipFile)
-	tmpDir := "/tmp/dstm-extract-json"
+	tmpDir := "/tmp/dstm-extract-worldgen-template"
 	scriptDir := tmpDir + "/scripts"
 	workDir := tmpDir + "/work"
 
