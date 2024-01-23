@@ -36,7 +36,7 @@ var rootCmd = &cobra.Command{
 	Short:   "Tools for Don't Starve Together Dedicated Server",
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		global.SetDefaultLogger()
+		global.InitCustomLogLevelAndFormat()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
