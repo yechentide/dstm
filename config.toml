@@ -1,3 +1,4 @@
+noColor = false
 logLevel = "debug"
 cacheDir = "$HOME/.cache/dstm"
 

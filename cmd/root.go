@@ -58,6 +58,9 @@ func init() {
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
 
+	rootCmd.PersistentFlags().Bool("no-color", false, "disable color")
+	viper.BindPFlag("noColor", rootCmd.PersistentFlags().Lookup("no-color"))
+
 	rootCmd.PersistentFlags().String("log-level", "info", "change log error")
 	viper.BindPFlag("logLevel", rootCmd.PersistentFlags().Lookup("log-level"))
 
@@ -78,6 +81,7 @@ func init() {
 }
 
 func initConfig() {
+	viper.SetDefault("noColor", false)
 	viper.SetDefault("logLevel", "info")
 	viper.SetDefault("cacheDir", "$HOME/.cache/dstm")
 	viper.SetDefault("steamRoot", "$HOME/Steam")

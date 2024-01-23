@@ -30,7 +30,7 @@ func newSimpleHandler(out io.Writer, level slog.Level) *simpleHandler {
 
 func (h *simpleHandler) Handle(_ context.Context, record slog.Record) error {
 	ts := record.Time.Format("[2006/01/02 15:04:05]")
-	level := fmt.Sprintf("%7s", "["+record.Level.String()+"]")
+	levelStr := fmt.Sprintf("%7s", "["+record.Level.String()+"]")
 	msg := record.Message
 	record.Attrs(func(attr slog.Attr) bool {
 		value := attr.Value.String()
@@ -41,7 +41,12 @@ func (h *simpleHandler) Handle(_ context.Context, record slog.Record) error {
 		}
 		return true
 	})
-	h.logger.Println(ts, level, msg)
+	if !viper.GetBool("noColor") {
+		ts = grayStyle.Render(ts)
+		levelStr = coloredLogLevel(record.Level, levelStr)
+		msg = coloredLogLevel(record.Level, msg)
+	}
+	h.logger.Println(ts, levelStr, msg)
 	return nil
 }
 
@@ -77,8 +82,4 @@ func ChangeLogLevel(level string) {
 		slog.Info("Current log level: " + level)
 		return
 	}
-	if logLevel.Level() == levelNone {
-		return
-	}
-	slog.Info("Use log level: " + logLevel.Level().String())
 }
