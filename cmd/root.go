@@ -27,6 +27,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/yechentide/dstm/cmd/deps"
+	"github.com/yechentide/dstm/cmd/extract"
+	"github.com/yechentide/dstm/cmd/server"
 	"github.com/yechentide/dstm/global"
 )
 
@@ -53,7 +56,11 @@ func Execute() {
 func init() {
 	// Flow: rootCmd.Execute --> flags processing --> cobra.OnInitialize --> rootCmd.Run
 	cobra.OnInitialize(initConfig)
+	addFlags()
+	addCommands()
+}
 
+func addFlags() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
@@ -78,6 +85,12 @@ func init() {
 
 	rootCmd.PersistentFlags().String("separator", "-", "tmux session name separator")
 	viper.BindPFlag("separator", rootCmd.PersistentFlags().Lookup("separator"))
+}
+
+func addCommands() {
+	rootCmd.AddCommand(deps.DepsCmd)
+	rootCmd.AddCommand(extract.ExtractCmd)
+	rootCmd.AddCommand(server.ServerCmd)
 }
 
 func initConfig() {

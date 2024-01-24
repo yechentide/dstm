@@ -1,10 +1,8 @@
-package cmd
+package deps
 
 import (
-	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -13,10 +11,11 @@ import (
 	"github.com/yechentide/dstm/shell"
 )
 
-var depsCmd = &cobra.Command{
-	Use:   "deps",
-	Short: "Install dependencies",
-	Long:  "Install dependencies.",
+var installCmd = &cobra.Command{
+	Use:     "install",
+	Aliases: []string{"i"},
+	Short:   "Install dependencies",
+	Long:    "Install dependencies.",
 	Run: func(cmd *cobra.Command, args []string) {
 		getHelper := func() env.OSHelper {
 			helper, err := env.GetOSHelper()
@@ -39,12 +38,8 @@ var depsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-		if isList {
-			helper := getHelper()
-			fmt.Println(strings.Join(helper.Dependencies(), " "))
-			os.Exit(0)
-		}
-		if isInstallPkg {
+
+		if pkgFlag {
 			installPkgs(args)
 			os.Exit(0)
 		}
@@ -105,7 +100,7 @@ var depsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-		if isInstallSteam {
+		if steamFlag {
 			prepareSteam()
 			os.Exit(0)
 		}
@@ -150,12 +145,12 @@ var depsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-		if isInstallDST {
+		if dstFlag {
 			prepareDSTServer()
 			os.Exit(0)
 		}
 
-		if isInstallAll {
+		if allFlag {
 			installPkgs([]string{})
 			prepareSteam()
 			prepareDSTServer()
@@ -167,22 +162,18 @@ var depsCmd = &cobra.Command{
 }
 
 var (
-	isList         bool
-	isInstallAll   bool
-	isInstallPkg   bool
-	isInstallSteam bool
-	isInstallDST   bool
+	allFlag   bool
+	pkgFlag   bool
+	steamFlag bool
+	dstFlag   bool
 )
 
 func init() {
-	rootCmd.AddCommand(depsCmd)
+	installCmd.Flags().BoolVarP(&allFlag, "all", "a", false, "install packages & steam & dst server")
+	installCmd.Flags().BoolVarP(&pkgFlag, "pkg", "p", false, "install specified packages, or all required packages if no one specified")
+	installCmd.Flags().BoolVarP(&steamFlag, "steam", "s", false, "install or update steam")
+	installCmd.Flags().BoolVarP(&dstFlag, "dst", "d", false, "install or update dst server")
 
-	depsCmd.Flags().BoolVarP(&isList, "list", "l", false, "list required packages")
-	depsCmd.Flags().BoolVarP(&isInstallAll, "install", "i", false, "install packages & steam & dst server")
-	depsCmd.Flags().BoolVar(&isInstallPkg, "install-pkg", false, "install specified packages, or all required packages if not specified")
-	depsCmd.Flags().BoolVar(&isInstallSteam, "install-steam", false, "install or update steam")
-	depsCmd.Flags().BoolVar(&isInstallDST, "install-dst", false, "install or update dst server")
-
-	depsCmd.MarkFlagsOneRequired("list", "install", "install-pkg", "install-steam", "install-dst")
-	depsCmd.MarkFlagsMutuallyExclusive("list", "install", "install-pkg", "install-steam", "install-dst")
+	installCmd.MarkFlagsOneRequired("all", "pkg", "steam", "dst")
+	installCmd.MarkFlagsMutuallyExclusive("all", "pkg", "steam", "dst")
 }

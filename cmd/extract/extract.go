@@ -1,4 +1,4 @@
-package cmd
+package extract
 
 import (
 	"log/slog"
@@ -9,7 +9,7 @@ import (
 	"github.com/yechentide/dstm/extractor"
 )
 
-var extractCmd = &cobra.Command{
+var ExtractCmd = &cobra.Command{
 	Use:   "extract",
 	Short: "Extract cluster settings in JSON",
 	Long:  "Extract cluster settings in JSON format from dst server files",
@@ -31,7 +31,5 @@ var extractCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(extractCmd)
-
-	extractCmd.Flags().StringP("output", "o", "", "output directory for cluster settings in JSON format")
+	ExtractCmd.Flags().StringP("output", "o", "", "output directory for cluster settings in JSON format")
 }
