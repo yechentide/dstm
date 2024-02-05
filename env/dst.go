@@ -9,7 +9,7 @@ import (
 )
 
 func updateDSTServer(steamRootPath string, serverRootPath string, betaName string) error {
-	scriptPath := utils.ExpandPath(steamRootPath + "/steamcmd.sh")
+	scriptPath := steamRootPath + "/steamcmd.sh"
 	args := []string{scriptPath, "+force_install_dir", serverRootPath, "+login", "anonymous", "+app_update", "343050"}
 	if betaName != "" {
 		slog.Debug("Installing beta: " + betaName)

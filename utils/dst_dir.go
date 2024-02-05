@@ -25,7 +25,6 @@ func IsShardDir(dirPath string) (bool, error) {
 }
 
 func ListAllClusters(worldsDirPath string) ([]string, error) {
-	worldsDirPath = ExpandPath(worldsDirPath)
 	dirs, err := ListDirs(worldsDirPath)
 	if err != nil {
 		return nil, err
@@ -47,7 +46,6 @@ func ListAllClusters(worldsDirPath string) ([]string, error) {
 }
 
 func ListShards(clusterDirPath string) ([]string, error) {
-	clusterDirPath = ExpandPath(clusterDirPath)
 	dirs, err := ListDirs(clusterDirPath)
 	if err != nil {
 		return nil, err

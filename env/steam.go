@@ -19,7 +19,7 @@ func steamScriptExists(steamRootPath string) (bool, error) {
 }
 
 func downloadSteamScript(steamRootPath string) error {
-	rootPath := utils.ExpandPath(steamRootPath)
+	rootPath := steamRootPath
 	err := utils.MkDirIfNotExists(rootPath, 0755, true)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func downloadSteamScript(steamRootPath string) error {
 }
 
 func updateSteam(steamRootPath string) error {
-	scriptPath := utils.ExpandPath(steamRootPath + "/steamcmd.sh")
+	scriptPath := steamRootPath + "/steamcmd.sh"
 	args := []string{scriptPath, "+login", "anonymous", "validate", "+quit"}
 	cmd := strings.Join(args, " ")
 	return shell.CreateTmuxSession(TmuxSessionForSteam, cmd)

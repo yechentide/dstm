@@ -1,7 +1,6 @@
 package shard
 
 import (
-	"github.com/yechentide/dstm/utils"
 	"gopkg.in/ini.v1"
 )
 
@@ -32,7 +31,6 @@ type shardAccountConfig struct {
 }
 
 func (s *ShardConfig) SaveTo(shardDirPath string) error {
-	shardDirPath = utils.ExpandPath(shardDirPath)
 	cfg := ini.Empty()
 	err := ini.ReflectFrom(cfg, s)
 	if err != nil {

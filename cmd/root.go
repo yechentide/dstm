@@ -24,6 +24,7 @@ package cmd
 import (
 	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,6 +32,7 @@ import (
 	"github.com/yechentide/dstm/cmd/extract"
 	"github.com/yechentide/dstm/cmd/server"
 	"github.com/yechentide/dstm/global"
+	"github.com/yechentide/dstm/utils"
 )
 
 var rootCmd = &cobra.Command{
@@ -40,6 +42,8 @@ var rootCmd = &cobra.Command{
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		global.InitCustomLogLevelAndFormat()
+		expandPaths()
+		debugConfig()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
@@ -126,4 +130,24 @@ func initConfig() {
 			slog.Error("Failed to read config file", "error", err)
 		}
 	}
+}
+
+func expandPaths() {
+	viper.Set("cacheDirPath", utils.ExpandPath(viper.GetString("cacheDirPath")))
+	viper.Set("steamRootPath", utils.ExpandPath(viper.GetString("steamRootPath")))
+	viper.Set("serverRootPath", utils.ExpandPath(viper.GetString("serverRootPath")))
+	viper.Set("dataRootPath", utils.ExpandPath(viper.GetString("dataRootPath")))
+}
+
+func debugConfig() {
+	slog.Debug("========== ========== ========== =========")
+	slog.Debug("noColor: " + strconv.FormatBool(viper.GetBool("noColor")))
+	slog.Debug("logLevel: " + viper.GetString("logLevel"))
+	slog.Debug("cacheDirPath: " + viper.GetString("cacheDirPath"))
+	slog.Debug("steamRootPath: " + viper.GetString("steamRootPath"))
+	slog.Debug("serverRootPath: " + viper.GetString("serverRootPath"))
+	slog.Debug("dataRootPath: " + viper.GetString("dataRootPath"))
+	slog.Debug("worldsDirName: " + viper.GetString("worldsDirName"))
+	slog.Debug("separator: " + viper.GetString("separator"))
+	slog.Debug("========== ========== ========== =========")
 }

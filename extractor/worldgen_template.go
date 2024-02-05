@@ -3,7 +3,6 @@ package extractor
 import (
 	"embed"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"log/slog"
@@ -20,11 +19,10 @@ import (
 var scriptsDir embed.FS
 
 func ExtractSettings(serverRootPath, outputDirPath string) error {
-	serverRootPath = utils.ExpandPath(serverRootPath)
 	serverVersion := getServerVersion(serverRootPath)
 
 	zipFile := serverRootPath + "/data/databundles/scripts.zip"
-	zipFilePath := utils.ExpandPath(zipFile)
+	zipFilePath := zipFile
 	tmpDir := "/tmp/dstm-extract-worldgen-template"
 	scriptDir := tmpDir + "/scripts"
 	workDir := tmpDir + "/work"
@@ -39,13 +37,11 @@ func ExtractSettings(serverRootPath, outputDirPath string) error {
 		return err
 	}
 
-	outputDirPath = utils.ExpandPath(outputDirPath)
 	return executeLuaScriptToExtractSettings(workDir, outputDirPath, serverVersion)
 }
 
 func getServerVersion(serverRootPath string) string {
 	versionFile := serverRootPath + "/version.txt"
-	fmt.Println(versionFile)
 	exists, err := utils.FileExists(versionFile)
 	if err != nil || !exists {
 		return ""

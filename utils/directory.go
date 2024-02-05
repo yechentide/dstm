@@ -8,8 +8,7 @@ import (
 	"strings"
 )
 
-func DirExists(path string) (bool, error) {
-	dirPath := ExpandPath(path)
+func DirExists(dirPath string) (bool, error) {
 	f, err := os.Stat(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -24,8 +23,7 @@ func DirExists(path string) (bool, error) {
 	return true, nil
 }
 
-func MkDirIfNotExists(path string, perm fs.FileMode, recursive bool) error {
-	dirPath := ExpandPath(path)
+func MkDirIfNotExists(dirPath string, perm fs.FileMode, recursive bool) error {
 	exists, err := DirExists(dirPath)
 	if err != nil {
 		return err
@@ -39,8 +37,7 @@ func MkDirIfNotExists(path string, perm fs.FileMode, recursive bool) error {
 	return os.Mkdir(dirPath, perm)
 }
 
-func DelDirIfExists(path string) error {
-	dirPath := ExpandPath(path)
+func DelDirIfExists(dirPath string) error {
 	exists, err := DirExists(dirPath)
 	if err != nil {
 		return err
@@ -51,18 +48,15 @@ func DelDirIfExists(path string) error {
 	return os.RemoveAll(dirPath)
 }
 
-func RemakeDir(path string, perm fs.FileMode, recursive bool) error {
-	err := DelDirIfExists(path)
+func RemakeDir(dirPath string, perm fs.FileMode, recursive bool) error {
+	err := DelDirIfExists(dirPath)
 	if err != nil {
 		return err
 	}
-	return MkDirIfNotExists(path, perm, recursive)
+	return MkDirIfNotExists(dirPath, perm, recursive)
 }
 
 func CopyDir(srcPath, destPath string) error {
-	srcPath = ExpandPath(srcPath)
-	destPath = ExpandPath(destPath)
-
 	srcDir, err := os.Stat(srcPath)
 	if err != nil {
 		return err

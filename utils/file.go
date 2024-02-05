@@ -6,8 +6,7 @@ import (
 	"os"
 )
 
-func FileExists(path string) (bool, error) {
-	filePath := ExpandPath(path)
+func FileExists(filePath string) (bool, error) {
 	f, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -23,7 +22,7 @@ func FileExists(path string) (bool, error) {
 }
 
 func WriteToFile(content, destPath string) error {
-	destFile, err := os.Create(ExpandPath(destPath))
+	destFile, err := os.Create(destPath)
 	if err != nil {
 		return err
 	}
@@ -34,13 +33,13 @@ func WriteToFile(content, destPath string) error {
 }
 
 func CopyFile(srcPath, destPath string) error {
-	srcFile, err := os.Open(ExpandPath(srcPath))
+	srcFile, err := os.Open(srcPath)
 	if err != nil {
 		return err
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.Create(ExpandPath(destPath))
+	destFile, err := os.Create(destPath)
 	if err != nil {
 		return err
 	}

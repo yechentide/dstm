@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/extractor"
+	"github.com/yechentide/dstm/utils"
 )
 
 var ExtractCmd = &cobra.Command{
@@ -23,7 +24,7 @@ var ExtractCmd = &cobra.Command{
 		outputDirPath := viper.GetString("cacheDirPath") + "/json"
 		specifiedDir, err := cmd.Flags().GetString("output")
 		if err == nil && specifiedDir != "" {
-			outputDirPath = specifiedDir
+			outputDirPath = utils.ExpandPath(specifiedDir)
 		}
 
 		extractor.ExtractSettings(serverRootPath, outputDirPath)

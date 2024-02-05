@@ -1,7 +1,6 @@
 package cluster
 
 import (
-	"github.com/yechentide/dstm/utils"
 	"gopkg.in/ini.v1"
 )
 
@@ -53,7 +52,6 @@ type clusterSteamConfig struct {
 }
 
 func (c *ClusterConfig) SaveTo(clusterDirPath string) error {
-	clusterDirPath = utils.ExpandPath(clusterDirPath)
 	cfg := ini.Empty()
 	err := ini.ReflectFrom(cfg, c)
 	if err != nil {

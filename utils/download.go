@@ -13,8 +13,7 @@ func DownloadFile(destPath string, url string) error {
 	}
 	defer resp.Body.Close()
 
-	p := ExpandPath(destPath)
-	out, err := os.Create(p)
+	out, err := os.Create(destPath)
 	if err != nil {
 		return err
 	}
