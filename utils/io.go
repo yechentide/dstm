@@ -163,3 +163,17 @@ func CopyDir(src, dest string) error {
 	})
 	return err
 }
+
+func ListDirs(parentDir string) ([]string, error) {
+	files, err := os.ReadDir(parentDir)
+	if err != nil {
+		return nil, nil
+	}
+	var dirs []string
+	for _, file := range files {
+		if file.IsDir() {
+			dirs = append(dirs, file.Name())
+		}
+	}
+	return dirs, nil
+}
