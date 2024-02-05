@@ -12,7 +12,7 @@ var restartCmd = &cobra.Command{
 	Short: "Restart dstm server",
 	Long:  "Restart dstm server.",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := server.RestartShard(targetCluster, targetShard, forceShutdown)
+		err := server.RestartShard(targetCluster, targetShard, skipModUpdate, forceShutdown)
 		if err != nil {
 			slog.Error("Something went wrong.", "error", err)
 		}
