@@ -10,8 +10,8 @@ import (
 
 // https://qiita.com/brushwood-field/items/417f7c07ee5813239ff3
 
-func Unzip(src, dest string, perm fs.FileMode) error {
-	r, err := zip.OpenReader(src)
+func Unzip(srcPath, destPath string, perm fs.FileMode) error {
+	r, err := zip.OpenReader(srcPath)
 	if err != nil {
 		return err
 	}
@@ -21,15 +21,15 @@ func Unzip(src, dest string, perm fs.FileMode) error {
 		if f.Mode().IsDir() {
 			continue
 		}
-		if err := saveUnzippedFile(dest, *f, perm); err != nil {
+		if err := saveUnzippedFile(destPath, *f, perm); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func saveUnzippedFile(destDir string, f zip.File, perm fs.FileMode) error {
-	destPath := filepath.Join(destDir, f.Name)
+func saveUnzippedFile(destDirPath string, f zip.File, perm fs.FileMode) error {
+	destPath := filepath.Join(destDirPath, f.Name)
 	if err := os.MkdirAll(filepath.Dir(destPath), perm); err != nil {
 		return err
 	}

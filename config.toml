@@ -1,9 +1,10 @@
 noColor = false
 logLevel = "debug"
-cacheDir = "$HOME/.cache/dstm"
+cacheDirPath = "$HOME/.cache/dstm"
 
-steamRoot = "$HOME/Steam"
-serverRoot = "$HOME/DST/Server"
-dataRoot = "$HOME/DST/Klei"
+steamRootPath = "$HOME/Steam"
+serverRootPath = "$HOME/DST/Server"
+dataRootPath = "$HOME/DST/Klei"
+worldsDirName = "Worlds"
 
 separator = "-"

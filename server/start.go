@@ -22,12 +22,11 @@ func StartShard(clusterName, shardName string, skipModUpdate bool) error {
 		return nil
 	}
 
-	serverRoot := viper.GetString("serverRoot")
-	ugcDir := serverRoot + "/ugc_mods"
-	dataRoot := viper.GetString("dataRoot")
-	worldsDirName := "worlds"
+	dataRootPath := viper.GetString("dataRootPath")
+	serverRootPath := viper.GetString("serverRootPath")
+	ugcDir := serverRootPath + "/ugc_mods"
 
-	cmd := "cd " + serverRoot
+	cmd := "cd " + serverRootPath
 	if env.Is64BitCPU() {
 		cmd = cmd + "/bin64; ./dontstarve_dedicated_server_nullrenderer_x64"
 	} else {
@@ -37,8 +36,8 @@ func StartShard(clusterName, shardName string, skipModUpdate bool) error {
 		cmd += " -skip_update_server_mods"
 	}
 	cmd += " -ugc_directory " + ugcDir
-	cmd += " -persistent_storage_root " + dataRoot
-	cmd += " -conf_dir " + worldsDirName
+	cmd += " -persistent_storage_root " + dataRootPath
+	cmd += " -conf_dir " + viper.GetString("worldsDirName")
 	cmd += " -cluster " + clusterName
 	cmd += " -shard " + shardName
 

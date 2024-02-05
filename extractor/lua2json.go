@@ -19,27 +19,27 @@ var (
 	utilsScript string
 )
 
-func GenerateWorldgenOverrideJson(shardDir string) (string, error) {
+func GenerateWorldgenOverrideJson(shardDirPath string) (string, error) {
 	fileNameForServer := "worldgenoverride.lua"
 	fileNameForPC := "leveldataoverride.lua"
 
-	exists, err := utils.FileExists(shardDir + "/" + fileNameForServer)
+	exists, err := utils.FileExists(shardDirPath + "/" + fileNameForServer)
 	if err != nil {
 		return "", err
 	}
 	if exists {
-		return ConvertLuaObjectToJson(shardDir + "/" + fileNameForServer)
+		return ConvertLuaObjectToJson(shardDirPath + "/" + fileNameForServer)
 	}
 
-	exists, err = utils.FileExists(shardDir + "/" + fileNameForPC)
+	exists, err = utils.FileExists(shardDirPath + "/" + fileNameForPC)
 	if err != nil {
 		return "", err
 	}
 	if exists {
-		return ConvertLuaObjectToJson(shardDir + "/" + fileNameForPC)
+		return ConvertLuaObjectToJson(shardDirPath + "/" + fileNameForPC)
 	}
 
-	return "", errors.New("file not found: " + shardDir + "/" + fileNameForServer)
+	return "", errors.New("file not found: " + shardDirPath + "/" + fileNameForServer)
 }
 
 func ConvertLuaObjectToJson(luaFilePath string) (string, error) {
@@ -60,11 +60,11 @@ func ConvertLuaObjectToJson(luaFilePath string) (string, error) {
 
 	fileNameWithExtension := filepath.Base(luaFilePath)
 	fileName := strings.TrimSuffix(fileNameWithExtension, filepath.Ext(fileNameWithExtension))
-	parentDir := filepath.Dir(luaFilePath)
+	parentDirPath := filepath.Dir(luaFilePath)
 
 	slog.Info("Converting lua object to json ...")
 	sessionName := "dstm-lua-to-json"
-	cmd := "cd '" + tmpDir + "' && lua ./main.lua '" + parentDir + "' '" + fileName + "'"
+	cmd := "cd '" + tmpDir + "' && lua ./main.lua '" + parentDirPath + "' '" + fileName + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {
 		return "", err
@@ -80,7 +80,7 @@ func ConvertLuaObjectToJson(luaFilePath string) (string, error) {
 		}
 	}
 
-	outputFilePath := parentDir + "/" + fileName + ".json"
+	outputFilePath := parentDirPath + "/" + fileName + ".json"
 	exists, err := utils.FileExists(outputFilePath)
 	if err != nil {
 		return "", err

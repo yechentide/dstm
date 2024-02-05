@@ -52,12 +52,12 @@ type clusterSteamConfig struct {
 	SteamGroupAdmins bool `json:"steam_group_admins"`
 }
 
-func (c *ClusterConfig) SaveTo(clusterDir string) error {
-	clusterDir = utils.ExpandPath(clusterDir)
+func (c *ClusterConfig) SaveTo(clusterDirPath string) error {
+	clusterDirPath = utils.ExpandPath(clusterDirPath)
 	cfg := ini.Empty()
 	err := ini.ReflectFrom(cfg, c)
 	if err != nil {
 		return err
 	}
-	return cfg.SaveTo(clusterDir + "/cluster.ini")
+	return cfg.SaveTo(clusterDirPath + "/cluster.ini")
 }

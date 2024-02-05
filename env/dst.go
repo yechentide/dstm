@@ -8,9 +8,9 @@ import (
 	"github.com/yechentide/dstm/utils"
 )
 
-func updateDSTServer(steamRoot string, serverRoot string, betaName string) error {
-	scriptPath := utils.ExpandPath(steamRoot + "/steamcmd.sh")
-	args := []string{scriptPath, "+force_install_dir", serverRoot, "+login", "anonymous", "+app_update", "343050"}
+func updateDSTServer(steamRootPath string, serverRootPath string, betaName string) error {
+	scriptPath := utils.ExpandPath(steamRootPath + "/steamcmd.sh")
+	args := []string{scriptPath, "+force_install_dir", serverRootPath, "+login", "anonymous", "+app_update", "343050"}
 	if betaName != "" {
 		slog.Debug("Installing beta: " + betaName)
 		args = append(args, "-beta", betaName)
@@ -21,22 +21,22 @@ func updateDSTServer(steamRoot string, serverRoot string, betaName string) error
 	return shell.CreateTmuxSession(TmuxSessionForDST, cmd)
 }
 
-func PrepareLatestDSTServer(steamRoot string, serverRoot string, betaName string) error {
-	exists, err := IsSteamAvailable(steamRoot)
+func PrepareLatestDSTServer(steamRootPath string, serverRootPath string, betaName string) error {
+	exists, err := IsSteamAvailable(steamRootPath)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		err = PrepareLatestSteam(steamRoot)
+		err = PrepareLatestSteam(steamRootPath)
 		if err != nil {
 			return err
 		}
 	}
-	return updateDSTServer(steamRoot, serverRoot, betaName)
+	return updateDSTServer(steamRootPath, serverRootPath, betaName)
 }
 
-func IsDSTServerAvailable(serverRoot string) (bool, error) {
-	exists, err := utils.FileExists(serverRoot + "/bin64/dontstarve_dedicated_server_nullrenderer_x64")
+func IsDSTServerAvailable(serverRootPath string) (bool, error) {
+	exists, err := utils.FileExists(serverRootPath + "/bin64/dontstarve_dedicated_server_nullrenderer_x64")
 	if err != nil {
 		return false, err
 	}

@@ -2,8 +2,8 @@ package cluster
 
 import "gopkg.in/ini.v1"
 
-func ReadClusterINI(clusterDir string) (*ClusterConfig, error) {
-	iniFile, err := ini.Load(clusterDir + "/cluster.ini")
+func ReadClusterINI(clusterDirPath string) (*ClusterConfig, error) {
+	iniFile, err := ini.Load(clusterDirPath + "/cluster.ini")
 	if err != nil {
 		return nil, err
 	}

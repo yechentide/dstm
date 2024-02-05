@@ -63,12 +63,12 @@ var installCmd = &cobra.Command{
 			return checkFunc()
 		}
 
-		steamRoot := viper.GetString("steamRoot")
-		serverRoot := viper.GetString("serverRoot")
+		steamRootPath := viper.GetString("steamRootPath")
+		serverRootPath := viper.GetString("serverRootPath")
 
 		checkSteamRoot := func() {
-			if steamRoot == "" {
-				slog.Error("Please use --steam-root flag or config file to specify steam root directory")
+			if steamRootPath == "" {
+				slog.Error("Please use --steam-root-path flag or config file to specify steam root directory")
 				os.Exit(1)
 			}
 		}
@@ -89,12 +89,12 @@ var installCmd = &cobra.Command{
 				return
 			}
 			checkSteamRoot()
-			err := env.PrepareLatestSteam(steamRoot)
+			err := env.PrepareLatestSteam(steamRootPath)
 			if err != nil {
 				slog.Error("Failed to prepare steam", err)
 				os.Exit(1)
 			}
-			steamOK := waitForCompletion(env.TmuxSessionForSteam, checkSteamAvailable(steamRoot))
+			steamOK := waitForCompletion(env.TmuxSessionForSteam, checkSteamAvailable(steamRootPath))
 			if !steamOK {
 				slog.Error("Steam installation failed")
 				os.Exit(1)
@@ -106,8 +106,8 @@ var installCmd = &cobra.Command{
 		}
 
 		checkServerRoot := func() {
-			if serverRoot == "" {
-				slog.Error("Please use --server-root flag or config file to specify dst root directory")
+			if serverRootPath == "" {
+				slog.Error("Please use --server-root-path flag or config file to specify dst root directory")
 				os.Exit(1)
 			}
 		}
@@ -128,18 +128,18 @@ var installCmd = &cobra.Command{
 				return
 			}
 			checkSteamRoot()
-			steamOK := checkSteamAvailable(steamRoot)()
+			steamOK := checkSteamAvailable(steamRootPath)()
 			if !steamOK {
 				slog.Error("Steam installation failed")
 				os.Exit(1)
 			}
 			checkServerRoot()
-			err := env.PrepareLatestDSTServer(steamRoot, serverRoot, "")
+			err := env.PrepareLatestDSTServer(steamRootPath, serverRootPath, "")
 			if err != nil {
 				slog.Error("Failed to prepare dst server", err)
 				os.Exit(1)
 			}
-			dstOK := waitForCompletion(env.TmuxSessionForDST, checkDSTAvailable(serverRoot))
+			dstOK := waitForCompletion(env.TmuxSessionForDST, checkDSTAvailable(serverRootPath))
 			if !dstOK {
 				slog.Error("DST installation failed")
 				os.Exit(1)

@@ -2,8 +2,8 @@ package shard
 
 import "gopkg.in/ini.v1"
 
-func ReadServerINI(location, shardDir string) (*ShardConfig, error) {
-	iniFile, err := ini.Load(shardDir + "/server.ini")
+func ReadServerINI(shardDirPath, location string) (*ShardConfig, error) {
+	iniFile, err := ini.Load(shardDirPath + "/server.ini")
 	if err != nil {
 		return nil, err
 	}

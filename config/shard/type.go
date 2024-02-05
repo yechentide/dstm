@@ -31,12 +31,12 @@ type shardAccountConfig struct {
 	EncodeUserPath bool `ini:"encode_user_path"`
 }
 
-func (s *ShardConfig) SaveTo(shardDir string) error {
-	shardDir = utils.ExpandPath(shardDir)
+func (s *ShardConfig) SaveTo(shardDirPath string) error {
+	shardDirPath = utils.ExpandPath(shardDirPath)
 	cfg := ini.Empty()
 	err := ini.ReflectFrom(cfg, s)
 	if err != nil {
 		return err
 	}
-	return cfg.SaveTo(shardDir + "/server.ini")
+	return cfg.SaveTo(shardDirPath + "/server.ini")
 }

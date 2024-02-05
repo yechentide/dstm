@@ -18,7 +18,7 @@ func UpdateClusterConfig(cfg *cluster.ClusterConfig) {
 }
 
 func CreateCluster() {
-	worldsDir := viper.GetString("dataRoot") + "/worlds"
+	worldsDir := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
 	existClusters, err := utils.ListAllClusters(worldsDir)
 	if err == nil {
 		msg := "Exist clusters:"
@@ -69,7 +69,7 @@ func UpdateShardConfig(config *shard.ShardConfig) {
 }
 
 func CreateShard(cluster string) {
-	worldsDir := viper.GetString("dataRoot") + "/worlds"
+	worldsDir := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
 	clusterDir := worldsDir + "/" + cluster
 	ok, err := utils.IsClusterDir(clusterDir)
 	if err != nil {

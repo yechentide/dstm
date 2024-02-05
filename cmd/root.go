@@ -71,17 +71,20 @@ func addFlags() {
 	rootCmd.PersistentFlags().String("log-level", "info", "change log error")
 	viper.BindPFlag("logLevel", rootCmd.PersistentFlags().Lookup("log-level"))
 
-	rootCmd.PersistentFlags().String("cache-dir", "$HOME/.cache/dstm", "cache directory")
-	viper.BindPFlag("cacheDir", rootCmd.PersistentFlags().Lookup("cache-dir"))
+	rootCmd.PersistentFlags().String("cache-dir-path", "$HOME/.cache/dstm", "path of cache directory")
+	viper.BindPFlag("cacheDirPath", rootCmd.PersistentFlags().Lookup("cache-dir-path"))
 
-	rootCmd.PersistentFlags().String("steam-root", "$HOME/Steam", "steam root directory")
-	viper.BindPFlag("steamRoot", rootCmd.PersistentFlags().Lookup("steam-root"))
+	rootCmd.PersistentFlags().String("steam-root-path", "$HOME/Steam", "path of steam root directory")
+	viper.BindPFlag("steamRootPath", rootCmd.PersistentFlags().Lookup("steam-root-path"))
 
-	rootCmd.PersistentFlags().String("server-root", "$HOME/DST/Server", "dst server root directory")
-	viper.BindPFlag("serverRoot", rootCmd.PersistentFlags().Lookup("server-root"))
+	rootCmd.PersistentFlags().String("server-root-path", "$HOME/DST/Server", "path of dst server root directory")
+	viper.BindPFlag("serverRootPath", rootCmd.PersistentFlags().Lookup("server-root-path"))
 
-	rootCmd.PersistentFlags().String("data-root", "$HOME/DST/Klei", "dst save data root directory")
-	viper.BindPFlag("dataRoot", rootCmd.PersistentFlags().Lookup("data-root"))
+	rootCmd.PersistentFlags().String("data-root-path", "$HOME/DST/Klei", "path of the dst save data root directory")
+	viper.BindPFlag("dataRootPath", rootCmd.PersistentFlags().Lookup("data-root-path"))
+
+	rootCmd.PersistentFlags().String("worlds-dir", "Worlds", "worlds directory name")
+	viper.BindPFlag("worldsDir", rootCmd.PersistentFlags().Lookup("worlds-dir"))
 
 	rootCmd.PersistentFlags().String("separator", "-", "tmux session name separator")
 	viper.BindPFlag("separator", rootCmd.PersistentFlags().Lookup("separator"))
@@ -96,10 +99,11 @@ func addCommands() {
 func initConfig() {
 	viper.SetDefault("noColor", false)
 	viper.SetDefault("logLevel", "info")
-	viper.SetDefault("cacheDir", "$HOME/.cache/dstm")
-	viper.SetDefault("steamRoot", "$HOME/Steam")
-	viper.SetDefault("serverRoot", "$HOME/DST/Server")
-	viper.SetDefault("dataRoot", "$HOME/DST/Klei")
+	viper.SetDefault("cacheDirPath", "$HOME/.cache/dstm")
+	viper.SetDefault("steamRootPath", "$HOME/Steam")
+	viper.SetDefault("serverRootPath", "$HOME/DST/Server")
+	viper.SetDefault("dataRootPath", "$HOME/DST/Klei")
+	viper.SetDefault("worldsDirName", "Worlds")
 	viper.SetDefault("separator", "-")
 
 	viper.SetConfigName("config")

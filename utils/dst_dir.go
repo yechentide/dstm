@@ -24,16 +24,16 @@ func IsShardDir(dirPath string) (bool, error) {
 	return FileExists(dirPath + "/server.ini")
 }
 
-func ListAllClusters(worldsDir string) ([]string, error) {
-	worldsDir = ExpandPath(worldsDir)
-	dirs, err := ListDirs(worldsDir)
+func ListAllClusters(worldsDirPath string) ([]string, error) {
+	worldsDirPath = ExpandPath(worldsDirPath)
+	dirs, err := ListDirs(worldsDirPath)
 	if err != nil {
 		return nil, err
 	}
 
 	var clusters []string
 	for _, dirName := range dirs {
-		path := worldsDir + "/" + dirName
+		path := worldsDirPath + "/" + dirName
 		isCluster, err := IsClusterDir(path)
 		if err != nil {
 			slog.Warn("Something went wrong.", "error", err)
@@ -46,16 +46,16 @@ func ListAllClusters(worldsDir string) ([]string, error) {
 	return clusters, nil
 }
 
-func ListShards(clusterDir string) ([]string, error) {
-	clusterDir = ExpandPath(clusterDir)
-	dirs, err := ListDirs(clusterDir)
+func ListShards(clusterDirPath string) ([]string, error) {
+	clusterDirPath = ExpandPath(clusterDirPath)
+	dirs, err := ListDirs(clusterDirPath)
 	if err != nil {
 		return nil, err
 	}
 
 	var shards []string
 	for _, dirName := range dirs {
-		path := clusterDir + "/" + dirName
+		path := clusterDirPath + "/" + dirName
 		isShard, err := IsShardDir(path)
 		if err != nil {
 			slog.Warn("Something went wrong.", "error", err)

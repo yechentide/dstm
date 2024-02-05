@@ -7,8 +7,8 @@ import (
 	"github.com/yechentide/dstm/extractor"
 )
 
-func ReadWorldgenOverride(shardDir, tempJson string) (*WorldConfig, error) {
-	currentJson, err := extractor.GenerateWorldgenOverrideJson(shardDir)
+func ReadWorldgenOverride(shardDirPath, tempJsonPath string) (*WorldConfig, error) {
+	currentJson, err := extractor.GenerateWorldgenOverrideJson(shardDirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func ReadWorldgenOverride(shardDir, tempJson string) (*WorldConfig, error) {
 		return nil, err
 	}
 
-	cfg, err := MakeDefaultConfig(tempJson)
+	cfg, err := MakeDefaultConfig(tempJsonPath)
 	if err != nil {
 		return nil, err
 	}
@@ -38,10 +38,10 @@ func ReadWorldgenOverride(shardDir, tempJson string) (*WorldConfig, error) {
 	return cfg, nil
 }
 
-func MakeDefaultConfig(tempJson string) (*WorldConfig, error) {
+func MakeDefaultConfig(tempJsonPath string) (*WorldConfig, error) {
 	var cfg WorldConfig
 
-	file, err := os.Open(tempJson)
+	file, err := os.Open(tempJsonPath)
 	if err != nil {
 		return nil, err
 	}

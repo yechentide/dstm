@@ -19,11 +19,11 @@ import (
 //go:embed worldgen_template
 var scriptsDir embed.FS
 
-func ExtractSettings(serverRoot, outputDir string) error {
-	serverRoot = utils.ExpandPath(serverRoot)
-	serverVersion := getServerVersion(serverRoot)
+func ExtractSettings(serverRootPath, outputDirPath string) error {
+	serverRootPath = utils.ExpandPath(serverRootPath)
+	serverVersion := getServerVersion(serverRootPath)
 
-	zipFile := serverRoot + "/data/databundles/scripts.zip"
+	zipFile := serverRootPath + "/data/databundles/scripts.zip"
 	zipFilePath := utils.ExpandPath(zipFile)
 	tmpDir := "/tmp/dstm-extract-worldgen-template"
 	scriptDir := tmpDir + "/scripts"
@@ -39,12 +39,12 @@ func ExtractSettings(serverRoot, outputDir string) error {
 		return err
 	}
 
-	outputDir = utils.ExpandPath(outputDir)
-	return executeLuaScriptToExtractSettings(workDir, outputDir, serverVersion)
+	outputDirPath = utils.ExpandPath(outputDirPath)
+	return executeLuaScriptToExtractSettings(workDir, outputDirPath, serverVersion)
 }
 
-func getServerVersion(serverRoot string) string {
-	versionFile := serverRoot + "/version.txt"
+func getServerVersion(serverRootPath string) string {
+	versionFile := serverRootPath + "/version.txt"
 	fmt.Println(versionFile)
 	exists, err := utils.FileExists(versionFile)
 	if err != nil || !exists {
@@ -57,15 +57,15 @@ func getServerVersion(serverRoot string) string {
 	return strings.TrimSpace(string(data))
 }
 
-func executeLuaScriptToExtractSettings(workDir, outputDir, serverVersion string) error {
-	err := utils.MkDirIfNotExists(outputDir, 0755, true)
+func executeLuaScriptToExtractSettings(workDirPath, outputDirPath, serverVersion string) error {
+	err := utils.MkDirIfNotExists(outputDirPath, 0755, true)
 	if err != nil {
 		return err
 	}
 
 	slog.Info("Extracting cluster json settings ...")
 	sessionName := "dstm-extract-settings"
-	cmd := "cd '" + workDir + "' && lua ./main.lua '" + outputDir + "' '" + serverVersion + "'"
+	cmd := "cd '" + workDirPath + "' && lua ./main.lua '" + outputDirPath + "' '" + serverVersion + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {
 		return err
@@ -80,31 +80,31 @@ func executeLuaScriptToExtractSettings(workDir, outputDir, serverVersion string)
 			break
 		}
 	}
-	exists, err := utils.FileExists(outputDir + "/en.forest.master.json")
+	exists, err := utils.FileExists(outputDirPath + "/en.forest.master.json")
 	if err != nil {
 		return err
 	}
 	if !exists {
 		return errors.New("failed to extract settings")
 	}
-	slog.Info("Cluster json settings extracted to " + outputDir)
+	slog.Info("Cluster json settings extracted to " + outputDirPath)
 	return nil
 }
 
-func prepareFiles(zipFile, tmpDir, scriptDir, destDir string) error {
-	slog.Info("Unzipping scripts to " + tmpDir)
-	err := utils.Unzip(zipFile, tmpDir, 0755)
+func prepareFiles(zipFilePath, tmpDirPath, scriptDirPath, destDirPath string) error {
+	slog.Info("Unzipping scripts to " + tmpDirPath)
+	err := utils.Unzip(zipFilePath, tmpDirPath, 0755)
 	if err != nil {
 		return err
 	}
 
 	slog.Info("Copying scripts ...")
-	err = copyParserAndMocks(destDir)
+	err = copyParserAndMocks(destDirPath)
 	if err != nil {
 		panic(err)
 	}
 
-	err = copyServerFiles(scriptDir, destDir)
+	err = copyServerFiles(scriptDirPath, destDirPath)
 	if err != nil {
 		panic(err)
 	}
@@ -112,9 +112,9 @@ func prepareFiles(zipFile, tmpDir, scriptDir, destDir string) error {
 	return nil
 }
 
-func copyParserAndMocks(destDir string) error {
+func copyParserAndMocks(destDirPath string) error {
 	err := fs.WalkDir(scriptsDir, "worldgen_template", func(path string, d fs.DirEntry, err error) error {
-		destPath := strings.Replace(path, "worldgen_template", destDir, 1)
+		destPath := strings.Replace(path, "worldgen_template", destDirPath, 1)
 		if d.IsDir() {
 			return utils.MkDirIfNotExists(destPath, 0755, true)
 		} else {
@@ -133,42 +133,42 @@ func copyParserAndMocks(destDir string) error {
 	return err
 }
 
-func copyServerFiles(scriptDir, destDir string) error {
+func copyServerFiles(scriptDirPath, destDirPath string) error {
 	targetDirs := []string{
-		scriptDir + "/languages",
-		scriptDir + "/map/levels",
-		scriptDir + "/map/tasksets",
+		scriptDirPath + "/languages",
+		scriptDirPath + "/map/levels",
+		scriptDirPath + "/map/tasksets",
 	}
 	targetFiles := []string{
-		scriptDir + "/map/customize.lua",
-		scriptDir + "/map/level.lua",
-		scriptDir + "/map/levels.lua",
-		scriptDir + "/map/locations.lua",
-		scriptDir + "/map/resource_substitution.lua",
-		scriptDir + "/map/settings.lua",
-		scriptDir + "/map/startlocations.lua",
-		scriptDir + "/map/tasksets.lua",
+		scriptDirPath + "/map/customize.lua",
+		scriptDirPath + "/map/level.lua",
+		scriptDirPath + "/map/levels.lua",
+		scriptDirPath + "/map/locations.lua",
+		scriptDirPath + "/map/resource_substitution.lua",
+		scriptDirPath + "/map/settings.lua",
+		scriptDirPath + "/map/startlocations.lua",
+		scriptDirPath + "/map/tasksets.lua",
 
-		scriptDir + "/constants.lua",
-		scriptDir + "/strings.lua",
+		scriptDirPath + "/constants.lua",
+		scriptDirPath + "/strings.lua",
 
-		scriptDir + "/class.lua",
-		scriptDir + "/strict.lua",
-		scriptDir + "/translator.lua",
+		scriptDirPath + "/class.lua",
+		scriptDirPath + "/strict.lua",
+		scriptDirPath + "/translator.lua",
 
-		scriptDir + "/beefalo_clothing.lua",
-		scriptDir + "/clothing.lua",
-		scriptDir + "/emote_items.lua",
-		scriptDir + "/item_blacklist.lua",
-		scriptDir + "/misc_items.lua",
-		scriptDir + "/prefabskins.lua",
-		scriptDir + "/skin_strings.lua",
-		scriptDir + "/techtree.lua",
-		scriptDir + "/tuning.lua",
-		scriptDir + "/worldsettings_overrides.lua",
+		scriptDirPath + "/beefalo_clothing.lua",
+		scriptDirPath + "/clothing.lua",
+		scriptDirPath + "/emote_items.lua",
+		scriptDirPath + "/item_blacklist.lua",
+		scriptDirPath + "/misc_items.lua",
+		scriptDirPath + "/prefabskins.lua",
+		scriptDirPath + "/skin_strings.lua",
+		scriptDirPath + "/techtree.lua",
+		scriptDirPath + "/tuning.lua",
+		scriptDirPath + "/worldsettings_overrides.lua",
 	}
 	targetPatterns := []string{
-		scriptDir + "/speech_*.lua",
+		scriptDirPath + "/speech_*.lua",
 	}
 	for _, pattern := range targetPatterns {
 		pathList, err := filepath.Glob(pattern)
@@ -179,14 +179,14 @@ func copyServerFiles(scriptDir, destDir string) error {
 	}
 
 	for _, dirPath := range targetDirs {
-		dest := strings.Replace(dirPath, scriptDir, destDir, 1)
+		dest := strings.Replace(dirPath, scriptDirPath, destDirPath, 1)
 		err := utils.CopyDir(dirPath, dest)
 		if err != nil {
 			panic(err)
 		}
 	}
 	for _, filePath := range targetFiles {
-		dest := strings.Replace(filePath, scriptDir, destDir, 1)
+		dest := strings.Replace(filePath, scriptDirPath, destDirPath, 1)
 		err := utils.CopyFile(filePath, dest)
 		if err != nil {
 			panic(err)

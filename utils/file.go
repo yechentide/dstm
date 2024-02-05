@@ -7,8 +7,8 @@ import (
 )
 
 func FileExists(path string) (bool, error) {
-	p := ExpandPath(path)
-	f, err := os.Stat(p)
+	filePath := ExpandPath(path)
+	f, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -17,7 +17,7 @@ func FileExists(path string) (bool, error) {
 		}
 	}
 	if f.IsDir() {
-		return false, errors.New("file is a directory: " + p)
+		return false, errors.New("file is a directory: " + filePath)
 	}
 	return true, nil
 }
@@ -33,14 +33,14 @@ func WriteToFile(content, destPath string) error {
 	return err
 }
 
-func CopyFile(src, dest string) error {
-	srcFile, err := os.Open(ExpandPath(src))
+func CopyFile(srcPath, destPath string) error {
+	srcFile, err := os.Open(ExpandPath(srcPath))
 	if err != nil {
 		return err
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.Create(ExpandPath(dest))
+	destFile, err := os.Create(ExpandPath(destPath))
 	if err != nil {
 		return err
 	}

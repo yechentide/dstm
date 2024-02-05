@@ -10,16 +10,16 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func steamScriptExists(steamRoot string) (bool, error) {
-	exists, err := utils.FileExists(steamRoot + "/steamcmd.sh")
+func steamScriptExists(steamRootPath string) (bool, error) {
+	exists, err := utils.FileExists(steamRootPath + "/steamcmd.sh")
 	if err != nil {
 		return false, err
 	}
 	return exists, nil
 }
 
-func downloadSteamScript(steamRoot string) error {
-	rootPath := utils.ExpandPath(steamRoot)
+func downloadSteamScript(steamRootPath string) error {
+	rootPath := utils.ExpandPath(steamRootPath)
 	err := utils.MkDirIfNotExists(rootPath, 0755, true)
 	if err != nil {
 		return err
@@ -45,29 +45,29 @@ func downloadSteamScript(steamRoot string) error {
 	return nil
 }
 
-func updateSteam(steamRoot string) error {
-	scriptPath := utils.ExpandPath(steamRoot + "/steamcmd.sh")
+func updateSteam(steamRootPath string) error {
+	scriptPath := utils.ExpandPath(steamRootPath + "/steamcmd.sh")
 	args := []string{scriptPath, "+login", "anonymous", "validate", "+quit"}
 	cmd := strings.Join(args, " ")
 	return shell.CreateTmuxSession(TmuxSessionForSteam, cmd)
 }
 
-func PrepareLatestSteam(steamRoot string) error {
-	exists, err := steamScriptExists(steamRoot)
+func PrepareLatestSteam(steamRootPath string) error {
+	exists, err := steamScriptExists(steamRootPath)
 	if err != nil {
 		return err
 	}
 	if !exists {
-		err = downloadSteamScript(steamRoot)
+		err = downloadSteamScript(steamRootPath)
 		if err != nil {
 			return err
 		}
 	}
-	return updateSteam(steamRoot)
+	return updateSteam(steamRootPath)
 }
 
-func IsSteamAvailable(steamRoot string) (bool, error) {
-	exists, err := utils.FileExists(steamRoot + "/linux32/steamclient.so")
+func IsSteamAvailable(steamRootPath string) (bool, error) {
+	exists, err := utils.FileExists(steamRootPath + "/linux32/steamclient.so")
 	if err != nil {
 		return false, err
 	}

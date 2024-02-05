@@ -60,6 +60,7 @@ func (w *WorldConfig) setAllCurrentDefault() {
 	}
 }
 
-func (w *WorldConfig) SaveTo(shardDir string) error {
+func (w *WorldConfig) SaveTo(shardDirPath string) error {
+	// TODO
 	return nil
 }

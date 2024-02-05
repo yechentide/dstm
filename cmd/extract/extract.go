@@ -14,19 +14,19 @@ var ExtractCmd = &cobra.Command{
 	Short: "Extract cluster settings in JSON",
 	Long:  "Extract cluster settings in JSON format from dst server files",
 	Run: func(cmd *cobra.Command, args []string) {
-		serverRoot := viper.GetString("serverRoot")
-		if serverRoot == "" {
+		serverRootPath := viper.GetString("serverRootPath")
+		if serverRootPath == "" {
 			slog.Error("Please use --server-root flag or config file to specify dst server root directory")
 			os.Exit(1)
 		}
 
-		outputDir := viper.GetString("cacheDir") + "/json"
+		outputDirPath := viper.GetString("cacheDirPath") + "/json"
 		specifiedDir, err := cmd.Flags().GetString("output")
 		if err == nil && specifiedDir != "" {
-			outputDir = specifiedDir
+			outputDirPath = specifiedDir
 		}
 
-		extractor.ExtractSettings(serverRoot, outputDir)
+		extractor.ExtractSettings(serverRootPath, outputDirPath)
 	},
 }
 

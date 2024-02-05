@@ -9,8 +9,8 @@ import (
 )
 
 func DirExists(path string) (bool, error) {
-	p := ExpandPath(path)
-	f, err := os.Stat(p)
+	dirPath := ExpandPath(path)
+	f, err := os.Stat(dirPath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false, nil
@@ -19,14 +19,14 @@ func DirExists(path string) (bool, error) {
 		}
 	}
 	if !f.IsDir() {
-		return false, errors.New("file is not a directory: " + p)
+		return false, errors.New("file is not a directory: " + dirPath)
 	}
 	return true, nil
 }
 
 func MkDirIfNotExists(path string, perm fs.FileMode, recursive bool) error {
-	p := ExpandPath(path)
-	exists, err := DirExists(p)
+	dirPath := ExpandPath(path)
+	exists, err := DirExists(dirPath)
 	if err != nil {
 		return err
 	}
@@ -34,21 +34,21 @@ func MkDirIfNotExists(path string, perm fs.FileMode, recursive bool) error {
 		return nil
 	}
 	if recursive {
-		return os.MkdirAll(p, perm)
+		return os.MkdirAll(dirPath, perm)
 	}
-	return os.Mkdir(p, perm)
+	return os.Mkdir(dirPath, perm)
 }
 
 func DelDirIfExists(path string) error {
-	p := ExpandPath(path)
-	exists, err := DirExists(p)
+	dirPath := ExpandPath(path)
+	exists, err := DirExists(dirPath)
 	if err != nil {
 		return err
 	}
 	if !exists {
 		return nil
 	}
-	return os.RemoveAll(p)
+	return os.RemoveAll(dirPath)
 }
 
 func RemakeDir(path string, perm fs.FileMode, recursive bool) error {
@@ -59,26 +59,26 @@ func RemakeDir(path string, perm fs.FileMode, recursive bool) error {
 	return MkDirIfNotExists(path, perm, recursive)
 }
 
-func CopyDir(src, dest string) error {
-	srcPath := ExpandPath(src)
-	destRootPath := ExpandPath(dest)
+func CopyDir(srcPath, destPath string) error {
+	srcPath = ExpandPath(srcPath)
+	destPath = ExpandPath(destPath)
 
 	srcDir, err := os.Stat(srcPath)
 	if err != nil {
 		return err
 	}
 
-	err = MkDirIfNotExists(destRootPath, srcDir.Mode(), true)
+	err = MkDirIfNotExists(destPath, srcDir.Mode(), true)
 	if err != nil {
 		return err
 	}
 
 	err = filepath.Walk(srcPath, func(path string, info fs.FileInfo, err error) error {
-		if path == src {
+		if path == srcPath {
 			return nil
 		}
 		var e error
-		destPath := strings.Replace(path, srcPath, destRootPath, 1)
+		destPath := strings.Replace(path, srcPath, destPath, 1)
 		if info.IsDir() {
 			e = MkDirIfNotExists(destPath, info.Mode(), true)
 		} else {
@@ -92,8 +92,9 @@ func CopyDir(src, dest string) error {
 	return err
 }
 
-func ListDirs(parentDir string) ([]string, error) {
-	files, err := os.ReadDir(parentDir)
+// list directory names
+func ListDirs(parentDirPath string) ([]string, error) {
+	files, err := os.ReadDir(parentDirPath)
 	if err != nil {
 		return nil, nil
 	}
