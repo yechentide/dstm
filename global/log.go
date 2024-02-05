@@ -42,7 +42,7 @@ func (h *simpleHandler) Handle(_ context.Context, record slog.Record) error {
 		return true
 	})
 	if !viper.GetBool("noColor") {
-		ts = grayStyle.Render(ts)
+		ts = GrayStyle.Render(ts)
 		levelStr = coloredLogLevel(record.Level, levelStr)
 		msg = coloredLogLevel(record.Level, msg)
 	}

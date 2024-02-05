@@ -7,20 +7,22 @@ import (
 )
 
 var (
-	grayStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "244", Dark: "244"})
-	debugStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "165", Dark: "165"})
-	warnStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "228", Dark: "228"})
-	errorStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "210", Dark: "210"})
+	GrayStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "244", Dark: "244"})
+	DebugStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "165", Dark: "165"})
+	WarnStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "228", Dark: "228"})
+	ErrorStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "210", Dark: "210"})
+	InfoStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "86", Dark: "86"})
+	OkStyle    = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "82", Dark: "82"})
 )
 
 func coloredLogLevel(level slog.Level, text string) string {
 	switch level.String() {
 	case "DEBUG":
-		return debugStyle.Render(text)
+		return DebugStyle.Render(text)
 	case "WARN":
-		return warnStyle.Render(text)
+		return WarnStyle.Render(text)
 	case "ERROR":
-		return errorStyle.Render(text)
+		return ErrorStyle.Render(text)
 	default:
 		return text
 	}
