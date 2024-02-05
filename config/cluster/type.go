@@ -1,6 +1,9 @@
 package cluster
 
-import "gopkg.in/ini.v1"
+import (
+	"github.com/yechentide/dstm/utils"
+	"gopkg.in/ini.v1"
+)
 
 type ClusterConfig struct {
 	Network clusterNetworkConfig  `json:"NETWORK"`
@@ -50,6 +53,7 @@ type clusterSteamConfig struct {
 }
 
 func (c *ClusterConfig) SaveTo(clusterDir string) error {
+	clusterDir = utils.ExpandPath(clusterDir)
 	cfg := ini.Empty()
 	err := ini.ReflectFrom(cfg, c)
 	if err != nil {
