@@ -59,7 +59,7 @@ func Selector(items []string, message string, multi bool) []string {
 
 	options := ""
 	for i, item := range items {
-		options += fmt.Sprintf("(%d) %s\t", i+1, item)
+		options += fmt.Sprintf("(%d) %s\n", i+1, item)
 	}
 	fmt.Println()
 	printInfo(message)
@@ -67,7 +67,7 @@ func Selector(items []string, message string, multi bool) []string {
 
 	answer := []string{}
 	for {
-		fmt.Print("-> ")
+		fmt.Print("Enter number -> ")
 		scanner.Scan()
 		input := scanner.Text()
 
