@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -36,4 +37,15 @@ func Unique(items []string) func(string) error {
 		}
 		return nil
 	}
+}
+
+func IsPort(portStr string) error {
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return err
+	}
+	if port < 0 || port > 65535 {
+		return errors.New("port out of range")
+	}
+	return nil
 }
