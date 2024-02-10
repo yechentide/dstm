@@ -61,8 +61,9 @@ func Selector(items []string, message string, multi bool) []string {
 	for i, item := range items {
 		options += fmt.Sprintf("(%d) %s\t", i+1, item)
 	}
+	fmt.Println()
+	printInfo(message)
 	fmt.Println(options)
-	fmt.Println(message)
 
 	answer := []string{}
 	for {
