@@ -2,9 +2,17 @@ package repl
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/yechentide/dstm/global"
 )
+
+func clearConsole() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
 
 func printError(message string) {
 	output := "[ERROR] " + message
