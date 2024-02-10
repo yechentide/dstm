@@ -3,17 +3,52 @@ package world
 import (
 	"encoding/json"
 	"os"
+	"path"
+	"strings"
 
+	"github.com/spf13/viper"
+	"github.com/yechentide/dstm/config/cluster"
+	"github.com/yechentide/dstm/config/shard"
 	"github.com/yechentide/dstm/extractor"
 )
 
-func ReadWorldgenOverride(shardDirPath, tempJsonPath string) (*WorldConfig, error) {
-	currentJson, err := extractor.GenerateWorldgenOverrideJson(shardDirPath)
+func getClusterLanguage(shardDirPath string) string {
+	clusterDirPath := path.Dir(shardDirPath)
+	config, err := cluster.ReadClusterINI(clusterDirPath)
+	if err == nil && config.Network.Lang != "" {
+		return config.Network.Lang
+	}
+	return "en"
+}
+
+func getLocation(override *worldgenOverride) string {
+	containCave := func(text string) bool {
+		return strings.Contains(strings.ToLower(text), "cave")
+	}
+	if containCave(override.ID) || containCave(override.Name) || containCave(override.Preset) || containCave(override.Location) {
+		return "cave"
+	}
+	return "forest"
+}
+
+func getTemplateJsonPath(shardDirPath string, override *worldgenOverride) string {
+	lang := getClusterLanguage(shardDirPath)
+	location := getLocation(override)
+	jsonFileName := lang + "." + location
+	shardConfig, err := shard.ReadServerINI(shardDirPath, location)
+	if err == nil && shardConfig.Shard.IsMaster {
+		jsonFileName += ".master"
+	}
+	return viper.GetString("cacheDirPath") + "/json/" + jsonFileName + ".json"
+}
+
+func ReadWorldgenOverride(shardDirPath string) (*WorldConfig, error) {
+	currentJsonPath, err := extractor.GenerateWorldgenOverrideJson(shardDirPath)
 	if err != nil {
 		return nil, err
 	}
 
-	file, err := os.Open(currentJson)
+	file, err := os.Open(currentJsonPath)
 	if err != nil {
 		return nil, err
 	}
@@ -26,6 +61,7 @@ func ReadWorldgenOverride(shardDirPath, tempJsonPath string) (*WorldConfig, erro
 		return nil, err
 	}
 
+	tempJsonPath := getTemplateJsonPath(shardDirPath, &jsonObject)
 	cfg, err := MakeDefaultConfig(tempJsonPath)
 	if err != nil {
 		return nil, err

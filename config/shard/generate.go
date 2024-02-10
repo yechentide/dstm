@@ -33,12 +33,18 @@ func MakeDefaultConfig(location string, isMaster bool) *ShardConfig {
 		serverPort = 11000
 		masterServerPort = 27018
 		authenticationPort = 8768
-	} else {
+	} else if location == "cave" {
 		name = "Cave"
 		id = 6661001
 		serverPort = 11001
 		masterServerPort = 27019
 		authenticationPort = 8769
+	} else {
+		name = "Shard Name"
+		id = 6661002
+		serverPort = 11002
+		masterServerPort = 27020
+		authenticationPort = 8770
 	}
 	if isMaster {
 		id = 1

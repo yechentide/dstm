@@ -10,6 +10,7 @@ type worldgenOverride struct {
 	ID        string                 `json:"id"`
 	Name      string                 `json:"name"`
 	Desc      string                 `json:"desc"`
+	Preset    string                 `json:"preset"`
 	Location  string                 `json:"location"`
 	PlayStyle string                 `json:"playstyle"`
 	Version   int                    `json:"version"`
@@ -21,17 +22,17 @@ type WorldConfig struct {
 	Language           string             `json:"language"`
 	Location           string             `json:"location"`
 	IsMaster           bool               `json:"is_master"`
-	WorldGenGroup      []worldConfigGroup `json:"worldgen_group"`
-	WorldSettingsGroup []worldConfigGroup `json:"worldsettings_group"`
+	WorldGenGroup      []WorldConfigGroup `json:"worldgen_group"`
+	WorldSettingsGroup []WorldConfigGroup `json:"worldsettings_group"`
 }
 
-type worldConfigGroup struct {
+type WorldConfigGroup struct {
 	Name  string            `json:"name"`
 	Label string            `json:"label"`
-	Items []worldConfigItem `json:"items"`
+	Items []WorldConfigItem `json:"items"`
 }
 
-type worldConfigItem struct {
+type WorldConfigItem struct {
 	Name       string                     `json:"name"`
 	Label      string                     `json:"label"`
 	Default    string                     `json:"default"`
