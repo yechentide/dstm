@@ -4,22 +4,29 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/config/cluster"
-	"github.com/yechentide/dstm/config/shard"
 	"github.com/yechentide/dstm/utils"
 )
 
-func UpdateClusterConfig(cfg *cluster.ClusterConfig) {
+func selectCluster(worldsDirPath string) string {
+	existClusters, err := utils.ListAllClusters(worldsDirPath)
+	if err != nil {
+		printError(err.Error())
+		os.Exit(1)
+	}
+	selected := Selector(existClusters, "Please select a cluster", false)[0]
+	return selected
+}
+
+func updateClusterConfig(cfg *cluster.ClusterConfig) {
 	// TODO
 	slog.Warn("Not implemented: UpdateClusterConfig()")
 }
 
-func CreateCluster() {
-	worldsDir := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
-	existClusters, err := utils.ListAllClusters(worldsDir)
+func showExistClusterList(worldsDirPath string) []string {
+	existClusters, err := utils.ListAllClusters(worldsDirPath)
 	if err == nil {
 		msg := "Exist clusters:"
 		for _, cluster := range existClusters {
@@ -27,23 +34,32 @@ func CreateCluster() {
 		}
 		printInfo(msg)
 	} else {
+		existClusters = []string{}
 		printError("Failed to list clusters")
 	}
 	fmt.Println()
+	return existClusters
+}
 
-	clusterName := Readline("Enter cluster name", []func(string) error{
-		utils.NotEmpty,
+func CreateCluster() {
+	worldsDirPath := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
+	existClusters := showExistClusterList(worldsDirPath)
+
+	clusterName := Readline("Enter cluster name (leave blank to cancel)", []func(string) error{
 		utils.NotContainSpace,
 		utils.Unique(existClusters),
 	})
+	if clusterName == "" {
+		os.Exit(0)
+	}
 
 	clusterToken := Readline("Enter cluster token", []func(string) error{
 		utils.NotContainSpace,
 		utils.IsClusterToken,
 	})
 
-	newClusterPath := worldsDir + "/" + clusterName
-	err = utils.MkDirIfNotExists(newClusterPath, 0755, false)
+	newClusterPath := worldsDirPath + "/" + clusterName
+	err := utils.MkDirIfNotExists(newClusterPath, 0755, false)
 	if err != nil {
 		printError("Failed to create cluster: " + err.Error())
 		os.Exit(1)
@@ -55,7 +71,7 @@ func CreateCluster() {
 	}
 
 	config := cluster.MakeDefaultConfig()
-	UpdateClusterConfig(config)
+	updateClusterConfig(config)
 	err = config.SaveTo(newClusterPath)
 	if err != nil {
 		printError("Failed to save cluster config: " + err.Error())
@@ -63,62 +79,14 @@ func CreateCluster() {
 	}
 }
 
-func UpdateShardConfig(config *shard.ShardConfig) {
-	// TODO
-	slog.Warn("Not implemented: UpdateShardConfig()")
-}
-
-func CreateShard(cluster string) {
-	worldsDir := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
-	clusterDir := worldsDir + "/" + cluster
-	ok, err := utils.IsClusterDir(clusterDir)
+func UpdateCluster() {
+	worldsDirPath := viper.GetString("dataRootPath") + "/" + viper.GetString("worldsDirName")
+	clusterDirPath := worldsDirPath + "/" + selectCluster(worldsDirPath)
+	config, err := cluster.ReadClusterINI(clusterDirPath)
 	if err != nil {
-		printError(err.Error())
+		printError("Failed to read cluster.ini in " + clusterDirPath)
 		os.Exit(1)
 	}
-	if !ok {
-		printError("Not a valid cluster: " + cluster)
-		os.Exit(1)
-	}
-
-	existShards, err := utils.ListShards(clusterDir)
-	if err == nil {
-		msg := "Exist shards:"
-		for _, shard := range existShards {
-			msg += " " + shard
-		}
-		printInfo(msg)
-	} else {
-		printError("can not list shards: " + err.Error())
-		os.Exit(1)
-	}
-	printWarn("First shard will be generated as master shard.")
-	shardType := Selector([]string{"forest", "cave"}, "Select shard type", false)[0]
-	shardName := "Main"
-	if len(existShards) > 0 {
-		count := 0
-		for _, shard := range existShards {
-			name := strings.ToLower(shard)
-			if strings.HasPrefix(name, shardType) {
-				count++
-			}
-		}
-		shardName = strings.ToUpper(string(shardType[0])) + shardType[1:] + fmt.Sprintf("%02d", count)
-	}
-	shardDir := clusterDir + "/" + shardName
-	err = utils.MkDirIfNotExists(shardDir, 0755, false)
-	if err != nil {
-		printError("Failed to create shard: " + err.Error())
-		os.Exit(1)
-	}
-
-	// server.ini
-	config := shard.MakeDefaultConfig(shardType, len(existShards) == 0)
-	UpdateShardConfig(config)
-	err = config.SaveTo(shardDir)
-	if err != nil {
-		printError("Failed to save shard config: " + err.Error())
-		os.Exit(1)
-	}
-	// worldgenoverride.lua
+	updateClusterConfig(config)
+	config.SaveTo(clusterDirPath)
 }
