@@ -1,5 +1,11 @@
 package world
 
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
 type worldgenOverride struct {
 	ID        string                 `json:"id"`
 	Name      string                 `json:"name"`
@@ -61,6 +67,36 @@ func (w *WorldConfig) setAllCurrentDefault() {
 }
 
 func (w *WorldConfig) SaveTo(shardDirPath string) error {
-	// TODO
-	return nil
+	overrideFilePath := shardDirPath + "/worldgenoverride.lua"
+
+	file, err := os.Create(overrideFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	builder := strings.Builder{}
+	builder.WriteString("return {\n")
+	if w.Location == "forest" {
+		builder.WriteString("  preset = \"SURVIVAL_TOGETHER\",\n")
+	} else {
+		builder.WriteString("  preset = \"DST_CAVE\",\n")
+	}
+	builder.WriteString("  override_enabled=true,\n")
+	builder.WriteString("  overrides={\n")
+	for _, group := range w.WorldGenGroup {
+		for _, item := range group.Items {
+			builder.WriteString(fmt.Sprintf("    %s=%s,\n", item.Name, item.Current))
+		}
+	}
+	for _, group := range w.WorldSettingsGroup {
+		for _, item := range group.Items {
+			builder.WriteString(fmt.Sprintf("    %s=%s,\n", item.Name, item.Current))
+		}
+	}
+	builder.WriteString("  }\n")
+	builder.WriteString("}\n")
+
+	_, err = file.WriteString(builder.String())
+	return err
 }
