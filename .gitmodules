@@ -1,3 +1,3 @@
-[submodule "extractor/worldgen_template"]
-	path = extractor/worldgen_template
-	url = https://github.com/yechentide/dst-worldgen
+[submodule "extractor/scripts"]
+	path = extractor/scripts
+	url = https://github.com/yechentide/dst-extractor.git
