@@ -73,7 +73,7 @@ func CreateShard() {
 		shardName = strings.ToUpper(string(shardType[0])) + shardType[1:] + fmt.Sprintf("%02d", count)
 	}
 	shardDir := clusterDirPath + "/" + shardName
-	err = utils.MkDirIfNotExists(shardDir, 0755, false)
+	err = os.Mkdir(shardDir, 0755)
 	if err != nil {
 		printError("Failed to create shard: " + err.Error())
 		os.Exit(1)

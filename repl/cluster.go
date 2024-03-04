@@ -59,7 +59,7 @@ func CreateCluster() {
 	})
 
 	newClusterPath := worldsDirPath + "/" + clusterName
-	err := utils.MkDirIfNotExists(newClusterPath, 0755, false)
+	err := os.Mkdir(newClusterPath, 0755)
 	if err != nil {
 		printError("Failed to create cluster: " + err.Error())
 		os.Exit(1)
