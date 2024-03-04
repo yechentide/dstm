@@ -2,6 +2,7 @@ package world
 
 import (
 	"encoding/json"
+	"log/slog"
 	"os"
 	"path"
 	"strings"
@@ -43,10 +44,12 @@ func getTemplateJsonPath(shardDirPath string, override *worldgenOverride) string
 }
 
 func ReadWorldgenOverride(shardDirPath string) (*WorldConfig, error) {
-	currentJsonPath, err := extractor.GenerateWorldgenOverrideJson(shardDirPath)
+	err := extractor.ExtractWorldgenOverride(shardDirPath, shardDirPath)
 	if err != nil {
 		return nil, err
 	}
+	currentJsonPath := shardDirPath + "/worldgenoverride.json"
+	defer os.Remove(currentJsonPath)
 
 	file, err := os.Open(currentJsonPath)
 	if err != nil {
@@ -96,6 +99,6 @@ func applyExistsWorldgenOverride(cfg *WorldConfig, exists *worldgenOverride) err
 	for k, v := range exists.Overrides {
 		overrides[k] = v
 	}
-	// TODO: reflect
+	slog.Warn("Not implemented: applyExistsWorldgenOverride()")
 	return nil
 }

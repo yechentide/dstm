@@ -96,7 +96,7 @@ func CreateShard() {
 		os.Exit(1)
 	}
 	if !jsonExists {
-		err = extractor.ExtractSettings(viper.GetString("serverRootPath"), outputDirPath)
+		err = extractor.ExtractWorldgenVanillaSettings(viper.GetString("serverRootPath"), outputDirPath)
 		if err != nil {
 			printError("Failed to extract json file: " + err.Error())
 			os.Exit(1)
