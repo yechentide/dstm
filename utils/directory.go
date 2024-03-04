@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"embed"
 	"errors"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -23,37 +25,16 @@ func DirExists(dirPath string) (bool, error) {
 	return true, nil
 }
 
-func MkDirIfNotExists(dirPath string, perm fs.FileMode, recursive bool) error {
-	exists, err := DirExists(dirPath)
+func RemakeDir(dirPath string, mode fs.FileMode, recursive bool) error {
+	err := os.RemoveAll(dirPath)
 	if err != nil {
 		return err
-	}
-	if exists {
-		return nil
 	}
 	if recursive {
-		return os.MkdirAll(dirPath, perm)
+		return os.MkdirAll(dirPath, mode)
+	} else {
+		return os.Mkdir(dirPath, mode)
 	}
-	return os.Mkdir(dirPath, perm)
-}
-
-func DelDirIfExists(dirPath string) error {
-	exists, err := DirExists(dirPath)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return nil
-	}
-	return os.RemoveAll(dirPath)
-}
-
-func RemakeDir(dirPath string, perm fs.FileMode, recursive bool) error {
-	err := DelDirIfExists(dirPath)
-	if err != nil {
-		return err
-	}
-	return MkDirIfNotExists(dirPath, perm, recursive)
 }
 
 func CopyDir(srcPath, destPath string) error {
@@ -62,7 +43,7 @@ func CopyDir(srcPath, destPath string) error {
 		return err
 	}
 
-	err = MkDirIfNotExists(destPath, srcDir.Mode(), true)
+	err = os.MkdirAll(destPath, srcDir.Mode())
 	if err != nil {
 		return err
 	}
@@ -74,7 +55,7 @@ func CopyDir(srcPath, destPath string) error {
 		var e error
 		destPath := strings.Replace(path, srcPath, destPath, 1)
 		if info.IsDir() {
-			e = MkDirIfNotExists(destPath, info.Mode(), true)
+			e = os.MkdirAll(destPath, info.Mode())
 		} else {
 			e = CopyFile(path, destPath)
 		}
@@ -86,11 +67,11 @@ func CopyDir(srcPath, destPath string) error {
 	return err
 }
 
-// list directory names
-func ListDirs(parentDirPath string) ([]string, error) {
+// List directory names
+func ListChildDirs(parentDirPath string) ([]string, error) {
 	files, err := os.ReadDir(parentDirPath)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	var dirs []string
 	for _, file := range files {
@@ -99,4 +80,33 @@ func ListDirs(parentDirPath string) ([]string, error) {
 		}
 	}
 	return dirs, nil
+}
+
+func CopyEmbeddedDir(embeddedDir embed.FS, root string, destDirPath string) error {
+	err := fs.WalkDir(embeddedDir, root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		destPath := strings.Replace(path, root, destDirPath, 1)
+
+		if d.IsDir() {
+			return os.MkdirAll(destPath, 0755)
+		}
+
+		file, err := embeddedDir.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		newFile, err := os.Create(destPath)
+		if err != nil {
+			return err
+		}
+		defer newFile.Close()
+
+		_, err = io.Copy(newFile, file)
+		return err
+	})
+	return err
 }

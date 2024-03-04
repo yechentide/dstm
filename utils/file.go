@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"embed"
 	"errors"
 	"io"
 	"os"
@@ -34,6 +35,23 @@ func WriteToFile(content, destPath string) error {
 
 func CopyFile(srcPath, destPath string) error {
 	srcFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	destFile, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, srcFile)
+	return err
+}
+
+func CopyEmbeddedFile(embeddedDir embed.FS, filePath, destPath string) error {
+	srcFile, err := embeddedDir.Open(filePath)
 	if err != nil {
 		return err
 	}
