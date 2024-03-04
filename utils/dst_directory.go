@@ -65,3 +65,14 @@ func ListShards(clusterDirPath string) ([]string, error) {
 	}
 	return shards, nil
 }
+
+func IsModDir(dirPath string) (bool, error) {
+	exists, err := DirExists(dirPath)
+	if err != nil {
+		return false, err
+	}
+	if !exists {
+		return false, nil
+	}
+	return FileExists(dirPath + "/modinfo.lua")
+}

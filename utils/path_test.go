@@ -68,3 +68,29 @@ func TestBuildAbsPathString_Error(t *testing.T) {
 	assert.EqualError(t, err, errMsg)
 	assert.Equal(t, "", absPath)
 }
+
+func TestGetModIDFromPath_Normal(t *testing.T) {
+	var modID string
+	var err error
+
+	modID, err = utils.GetModIDFromPath("./testdata/mods/1122334455")
+	assert.Nil(t, err)
+	assert.EqualValues(t, "1122334455", modID)
+
+	modID, err = utils.GetModIDFromPath("./testdata/mods/workshop-1122334455")
+	assert.Nil(t, err)
+	assert.EqualValues(t, "1122334455", modID)
+}
+
+func TestGetModIDFromPath_Error(t *testing.T) {
+	var modID string
+	var err error
+
+	modID, err = utils.GetModIDFromPath("./testdata/mods/")
+	assert.NotNil(t, err)
+	assert.EqualValues(t, "", modID)
+
+	modID, err = utils.GetModIDFromPath("./testdata/mods/workshop1122334455")
+	assert.NotNil(t, err)
+	assert.EqualValues(t, "", modID)
+}

@@ -29,7 +29,7 @@ func CompareVersion(targetVer, currentVer string) (int, error) {
 }
 
 func GetVersionNumbers(v string) ([]string, error) {
-	pattern := "^[vV]?([0-9]+).([0-9]+).([0-9]+)$"
+	pattern := `^[vV]?(\d+).(\d+).(\d+)$`
 	reg, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err

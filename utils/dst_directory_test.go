@@ -47,3 +47,19 @@ func TestListShards_Normal(t *testing.T) {
 	assert.Nil(t, err)
 	assert.EqualValues(t, []string{"shard01", "shard02", "shard03"}, actual)
 }
+
+func TestIsModDir_Normal(t *testing.T) {
+	isShard, err := utils.IsModDir("./testdata/mods/1122334455")
+	assert.Nil(t, err)
+	assert.True(t, isShard)
+
+	isShard, err = utils.IsModDir("./testdata/mods/workshop-5544332211")
+	assert.Nil(t, err)
+	assert.True(t, isShard)
+}
+
+func TestIsModDir_Invalid(t *testing.T) {
+	isShard, err := utils.IsModDir("./testdata/mods/7788996655")
+	assert.Nil(t, err)
+	assert.False(t, isShard)
+}
