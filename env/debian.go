@@ -57,24 +57,29 @@ func (d *DebianHelper) IsInstalled(packages []string) (map[string]bool, error) {
 	return installed, nil
 }
 
-func (d *DebianHelper) InstallPackages(packages []string) error {
-	isRoot := d.IsRoot()
-	if !isRoot && !d.HasSudoPermmission() {
+func (d *DebianHelper) InstallPackages(packages []string, password string) error {
+	if !d.IsRoot() && !d.HasSudoPermmission() {
 		slog.Error("You must have sudo permission to install packages")
 		os.Exit(1)
 	}
-	cmd := "apt install -y " + strings.Join(packages, " ")
-	if isRoot {
-		slog.Debug("Running command: " + cmd)
-		return exec.Command("bash", "-c", cmd).Run()
+	cmdString := "apt install -y " + strings.Join(packages, " ")
+	var cmd *exec.Cmd
+	if d.IsRoot() {
+		slog.Debug("Running command: " + cmdString)
+		cmd = exec.Command("bash", "-c", cmdString)
 	} else {
-		slog.Debug("Running command: sudo " + cmd)
-		return exec.Command("sudo", "bash", "-c", cmd).Run()
+		slog.Debug("Running command: sudo " + cmdString)
+		cmd = exec.Command("sudo", "bash", "-c", cmdString)
+		cmd.Stdin = strings.NewReader(password + "")
 	}
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
 }
 
-func (d *DebianHelper) InstallAllRequired() error {
+func (d *DebianHelper) InstallAllRequired(password string) error {
 	pkgs := d.Dependencies()
 	slog.Debug("Installing dependencies: " + strings.Join(pkgs, " "))
-	return d.InstallPackages(pkgs)
+	return d.InstallPackages(pkgs, password)
 }

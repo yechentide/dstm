@@ -14,8 +14,8 @@ type OSHelper interface {
 	HasSudoPermmission() bool
 	Dependencies() []string
 	IsInstalled([]string) (map[string]bool, error)
-	InstallPackages([]string) error
-	InstallAllRequired() error
+	InstallPackages([]string, string) error
+	InstallAllRequired(string) error
 }
 
 func checkOS() {
