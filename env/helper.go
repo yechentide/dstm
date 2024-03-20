@@ -14,6 +14,7 @@ type OSHelper interface {
 	HasSudoPermmission() bool
 	Dependencies() []string
 	IsInstalled([]string) (map[string]bool, error)
+	IsTerminalMultiplexerReady() (bool, error)
 	InstallPackages([]string, string) error
 	InstallAllRequired(string) error
 }

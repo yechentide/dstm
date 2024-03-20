@@ -34,10 +34,14 @@ func (d *DebianHelper) HasSudoPermmission() bool {
 }
 
 func (d *DebianHelper) Dependencies() []string {
-	return []string{"lib32gcc-s1", "lua5.3", "curl", "tmux"}
+	return []string{"lib32gcc-s1", "lua5.1", "curl", "tmux"}
 }
 
 func (d *DebianHelper) IsInstalled(packages []string) (map[string]bool, error) {
+	if len(packages) == 0 {
+		return map[string]bool{}, nil
+	}
+
 	installed := make(map[string]bool, len(packages))
 
 	tmpFilePath := "/tmp/is_installed.txt"
@@ -50,11 +54,22 @@ func (d *DebianHelper) IsInstalled(packages []string) (map[string]bool, error) {
 	for _, pkg := range packages {
 		output, err := shell.ExecuteAndGetOutput("grep", "^"+pkg+"$", tmpFilePath)
 		if err != nil {
-			return installed, errors.New(output)
+			return installed, errors.New("Package '" + pkg + "' not found.")
 		}
 		installed[pkg] = output == pkg
 	}
 	return installed, nil
+}
+
+func (d *DebianHelper) IsTerminalMultiplexerReady() (bool, error) {
+	result, err := d.IsInstalled([]string{"tmux"})
+	if err != nil {
+		return false, err
+	}
+	if result["tmux"] {
+		return true, nil
+	}
+	return false, nil
 }
 
 func (d *DebianHelper) InstallPackages(packages []string, password string) error {
@@ -68,9 +83,9 @@ func (d *DebianHelper) InstallPackages(packages []string, password string) error
 		slog.Debug("Running command: " + cmdString)
 		cmd = exec.Command("bash", "-c", cmdString)
 	} else {
-		slog.Debug("Running command: sudo " + cmdString)
-		cmd = exec.Command("sudo", "bash", "-c", cmdString)
-		cmd.Stdin = strings.NewReader(password + "")
+		slog.Debug("Running command: sudo -S " + cmdString)
+		cmd = exec.Command("bash", "-c", "sudo -S "+cmdString)
+		cmd.Stdin = strings.NewReader(password + "\n")
 	}
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
