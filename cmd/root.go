@@ -28,8 +28,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/yechentide/dstm/cmd/config"
-	"github.com/yechentide/dstm/cmd/create"
 	"github.com/yechentide/dstm/cmd/deps"
 	"github.com/yechentide/dstm/cmd/extract"
 	"github.com/yechentide/dstm/cmd/server"
@@ -100,8 +98,6 @@ func addCommands() {
 	rootCmd.AddCommand(deps.DepsCmd)
 	rootCmd.AddCommand(extract.ExtractCmd)
 	rootCmd.AddCommand(server.ServerCmd)
-	rootCmd.AddCommand(create.CreateCmd)
-	rootCmd.AddCommand(config.ConfigCmd)
 }
 
 func initConfig() {
