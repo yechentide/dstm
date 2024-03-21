@@ -49,6 +49,7 @@ func ExtractWorldgenOverride(shardDirPath, outputDirPath string) error {
 	if !exists {
 		return errors.New("failed to extract worldgen override")
 	}
+
 	slog.Info("Worldgen override extracted to " + outputDirPath)
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/spf13/cobra"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/server"
 )
 
@@ -15,6 +16,7 @@ var stopCmd = &cobra.Command{
 		err := server.StopShardIfExists(targetCluster, targetShard, forceShutdown)
 		if err != nil {
 			slog.Error("Something went wrong.", "error", err)
+			logger.PrintJsonResultAndExit(1)
 		}
 	},
 }

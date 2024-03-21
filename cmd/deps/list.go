@@ -3,11 +3,11 @@ package deps
 import (
 	"fmt"
 	"log/slog"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/yechentide/dstm/env"
+	"github.com/yechentide/dstm/logger"
 )
 
 var showStatus = false
@@ -21,15 +21,15 @@ var listCmd = &cobra.Command{
 		helper, err := env.GetOSHelper()
 		if err != nil {
 			slog.Error("Failed to get os helper", "error", err)
-			os.Exit(1)
+			logger.PrintJsonResultAndExit(1)
 		}
 
 		pkgs := helper.Dependencies()
 		if showStatus {
 			status, err := helper.IsInstalled(pkgs)
 			if err != nil {
-				slog.Error("", "error", err)
-				os.Exit(1)
+				slog.Error(err.Error())
+				logger.PrintJsonResultAndExit(1)
 			}
 			for pkg, isInstalled := range status {
 				if isInstalled {

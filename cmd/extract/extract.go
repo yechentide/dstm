@@ -2,11 +2,11 @@ package extract
 
 import (
 	"log/slog"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/extractor"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/utils"
 )
 
@@ -25,21 +25,21 @@ var ExtractCmd = &cobra.Command{
 			serverRootPath := viper.GetString("serverRootPath")
 			if serverRootPath == "" {
 				slog.Error("Please use --server-root flag or config file to specify dst server root directory")
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 			err := extractor.ExtractWorldgenVanillaSettings(serverRootPath, outputDirPath)
 			if err == nil {
 				return
 			} else {
 				slog.Error("Failed to extract worldgen vanilla settings", "error", err)
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 		}
 
 		if worldgenOverride {
 			if shardDirPath == "" {
 				slog.Error("Please use --shard-dir-path flag or config file to specify shard directory")
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			} else {
 				shardDirPath = utils.ExpandPath(shardDirPath)
 			}
@@ -48,14 +48,14 @@ var ExtractCmd = &cobra.Command{
 				return
 			} else {
 				slog.Error("Failed to extract worldgen override settings", "error", err)
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 		}
 
 		if modConfig {
 			if modDirPath == "" {
 				slog.Error("Please use --mod-dir-path flag or config file to specify mod directory")
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			} else {
 				modDirPath = utils.ExpandPath(modDirPath)
 			}
@@ -64,14 +64,14 @@ var ExtractCmd = &cobra.Command{
 				return
 			} else {
 				slog.Error("Failed to extract mod config settings", "error", err)
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 		}
 
 		if modOverride {
 			if shardDirPath == "" {
 				slog.Error("Please use --shard-dir-path flag or config file to specify shard directory")
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			} else {
 				shardDirPath = utils.ExpandPath(shardDirPath)
 			}
@@ -80,7 +80,7 @@ var ExtractCmd = &cobra.Command{
 				return
 			} else {
 				slog.Error("Failed to extract mod override settings", "error", err)
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 		}
 

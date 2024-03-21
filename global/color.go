@@ -1,8 +1,6 @@
 package global
 
 import (
-	"log/slog"
-
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -14,16 +12,3 @@ var (
 	InfoStyle  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "86", Dark: "86"})
 	OkStyle    = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "82", Dark: "82"})
 )
-
-func coloredLogLevel(level slog.Level, text string) string {
-	switch level.String() {
-	case "DEBUG":
-		return DebugStyle.Render(text)
-	case "WARN":
-		return WarnStyle.Render(text)
-	case "ERROR":
-		return ErrorStyle.Render(text)
-	default:
-		return text
-	}
-}
