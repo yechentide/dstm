@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 )
@@ -23,7 +24,7 @@ func ExtractModOverride(shardDirPath, outputDirPath string) error {
 
 	slog.Info("Extracting mod override ...")
 
-	sessionName := "dstm-extract-mod-override"
+	sessionName := global.SESSION_EXTRACT_MOD_OVERRIDE
 	cmd := "cd '" + luaScriptsDirPath + "' && lua convert-mod-override.lua '" + shardDirPath + "' '" + outputDirPath + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {

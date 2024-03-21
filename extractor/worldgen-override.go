@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 )
@@ -23,7 +24,7 @@ func ExtractWorldgenOverride(shardDirPath, outputDirPath string) error {
 
 	slog.Info("Extracting worldgen override ...")
 
-	sessionName := "dstm-extract-worldgen-override"
+	sessionName := global.SESSION_EXTRACT_WORLD_OVERRIDE
 	cmd := "cd '" + luaScriptsDirPath + "' && lua convert-worldgen-override.lua '" + shardDirPath + "' '" + outputDirPath + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {

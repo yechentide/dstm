@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"strings"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"golang.org/x/exp/slices"
 )
@@ -43,7 +44,7 @@ func (d *DebianHelper) IsInstalled(packages []string) (map[string]bool, error) {
 
 	installed := make(map[string]bool, len(packages))
 
-	tmpFilePath := "/tmp/is_installed.txt"
+	tmpFilePath := global.FILE_PATH_PKG_INSTALL_CHECK
 	listInstalledCmd := "dpkg-query -l | awk '{print $2}' > " + tmpFilePath
 	err := exec.Command("bash", "-c", listInstalledCmd).Run()
 	if err != nil {

@@ -40,7 +40,7 @@ func checkOS() {
 		os.Exit(1)
 	}
 	osDistro = value
-	osVer = osInfo.Section("").Key("VERSION_ID").String()
+	// osVer = osInfo.Section("").Key("VERSION_ID").String()
 }
 
 func GetOSHelper() (OSHelper, error) {

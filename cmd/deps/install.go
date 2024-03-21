@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/env"
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 )
 
@@ -130,7 +131,7 @@ func checkSteamRoot(steamRootPath string) {
 }
 
 func prepareSteam(steamRootPath string) {
-	sessionExists := checkTmuxSession(env.TmuxSessionForSteam)
+	sessionExists := checkTmuxSession(global.SESSION_STEAM_INSTALL)
 	if sessionExists {
 		slog.Info("Steam is installing")
 		return
@@ -141,7 +142,7 @@ func prepareSteam(steamRootPath string) {
 		slog.Error("Failed to prepare steam", err)
 		os.Exit(1)
 	}
-	steamOK := waitForCompletion(env.TmuxSessionForSteam, checkSteamAvailable(steamRootPath))
+	steamOK := waitForCompletion(global.SESSION_STEAM_INSTALL, checkSteamAvailable(steamRootPath))
 	if !steamOK {
 		slog.Error("Steam installation failed")
 		os.Exit(1)
@@ -181,7 +182,7 @@ func checkDSTAvailable(serverRootPath string) func() bool {
 }
 
 func prepareDSTServer(steamRootPath, serverRootPath string) {
-	sessionExists := checkTmuxSession(env.TmuxSessionForDST)
+	sessionExists := checkTmuxSession(global.SESSION_DST_INSTALL)
 	if sessionExists {
 		slog.Info("Steam is installing")
 		return
@@ -198,7 +199,7 @@ func prepareDSTServer(steamRootPath, serverRootPath string) {
 		slog.Error("Failed to prepare dst server", err)
 		os.Exit(1)
 	}
-	dstOK := waitForCompletion(env.TmuxSessionForDST, checkDSTAvailable(serverRootPath))
+	dstOK := waitForCompletion(global.SESSION_DST_INSTALL, checkDSTAvailable(serverRootPath))
 	if !dstOK {
 		slog.Error("DST installation failed")
 		os.Exit(1)

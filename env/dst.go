@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 )
@@ -18,7 +19,7 @@ func updateDSTServer(steamRootPath string, serverRootPath string, betaName strin
 	args = append(args, "validate", "+quit")
 
 	cmd := strings.Join(args, " ")
-	return shell.CreateTmuxSession(TmuxSessionForDST, cmd)
+	return shell.CreateTmuxSession(global.SESSION_DST_INSTALL, cmd)
 }
 
 func PrepareLatestDSTServer(steamRootPath string, serverRootPath string, betaName string) error {

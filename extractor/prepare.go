@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/utils"
 )
 
@@ -14,7 +15,7 @@ import (
 var scriptsDir embed.FS
 
 func prepareLuaScripts() (string, error) {
-	destDirPath := "/tmp/dst-extractor"
+	destDirPath := global.DIR_PATH_EXTRACTOR_SCRIPT
 	dirExists, err := utils.DirExists(destDirPath)
 	if err != nil {
 		return "", err

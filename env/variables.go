@@ -21,10 +21,5 @@ var supportedOS = map[string]distro{
 
 var (
 	osDistro distro
-	osVer    string
-)
-
-const (
-	TmuxSessionForSteam = "dstm-install-steam"
-	TmuxSessionForDST   = "dstm-install-dst"
+	// osVer    string
 )

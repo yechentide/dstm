@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 )
@@ -36,7 +37,7 @@ func ExtractModConfiguration(modDirPath, outputDirPath, langCode string) error {
 
 	slog.Info("Extracting mod configuration ...")
 
-	sessionName := "dstm-extract-mod-config"
+	sessionName := global.SESSION_EXTRACT_MOD_CONFIG
 	cmd := "cd '" + luaScriptsDirPath + "' && lua extract-mod-config.lua '" + modDirPath + "' '" + outputDirPath + "' '" + langCode + "'"
 	err = shell.CreateTmuxSession(sessionName, cmd)
 	if err != nil {

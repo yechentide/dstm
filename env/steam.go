@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 	"golang.org/x/exp/slices"
@@ -49,7 +50,7 @@ func updateSteam(steamRootPath string) error {
 	scriptPath := steamRootPath + "/steamcmd.sh"
 	args := []string{scriptPath, "+login", "anonymous", "validate", "+quit"}
 	cmd := strings.Join(args, " ")
-	return shell.CreateTmuxSession(TmuxSessionForSteam, cmd)
+	return shell.CreateTmuxSession(global.SESSION_STEAM_INSTALL, cmd)
 }
 
 func PrepareLatestSteam(steamRootPath string) error {

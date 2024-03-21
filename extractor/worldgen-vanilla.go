@@ -7,13 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/yechentide/dstm/global"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 )
 
 func ExtractWorldgenVanillaSettings(serverRootPath, outputDirPath string) error {
 	zipFilePath := serverRootPath + "/data/databundles/scripts.zip"
-	tmpDirPath := "/tmp/dst-extract"
+	tmpDirPath := global.DIR_PATH_EXTRACT_WORKSPACE
 
 	err := os.RemoveAll(tmpDirPath)
 	if err != nil {
