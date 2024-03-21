@@ -1,9 +1,8 @@
 package config
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/repl"
 )
 
@@ -14,16 +13,17 @@ var ConfigCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if isCluster {
 			repl.UpdateCluster()
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
 		if isShard {
 			repl.UpdateShard()
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
 		if isWorld {
 			repl.UpdateWorld()
+			logger.PrintJsonResultAndExit(0)
 		}
 	},
 }

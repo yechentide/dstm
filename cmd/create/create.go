@@ -1,9 +1,8 @@
 package create
 
 import (
-	"os"
-
 	"github.com/spf13/cobra"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/repl"
 )
 
@@ -14,10 +13,11 @@ var CreateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if isCluster {
 			repl.CreateCluster()
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 		if isShard {
 			repl.CreateShard()
+			logger.PrintJsonResultAndExit(0)
 		}
 	},
 }

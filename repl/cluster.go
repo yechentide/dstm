@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/config/cluster"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/utils"
 )
 
@@ -14,7 +15,7 @@ func selectCluster(worldsDirPath string) string {
 	existClusters, err := utils.ListAllClusters(worldsDirPath)
 	if err != nil {
 		printError(err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	selected := Selector(existClusters, "Please select a cluster", false)[0]
 	return selected
@@ -50,7 +51,7 @@ func CreateCluster() {
 		utils.Unique(existClusters),
 	})
 	if clusterName == "" {
-		os.Exit(0)
+		logger.PrintJsonResultAndExit(0)
 	}
 
 	clusterToken := Readline("Enter cluster token", []func(string) error{
@@ -62,12 +63,12 @@ func CreateCluster() {
 	err := os.Mkdir(newClusterPath, 0755)
 	if err != nil {
 		printError("Failed to create cluster: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	err = utils.WriteToFile(clusterToken, newClusterPath+"/cluster_token.txt")
 	if err != nil {
 		printError("Failed to write cluster token: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 
 	config := cluster.MakeDefaultConfig()
@@ -75,7 +76,7 @@ func CreateCluster() {
 	err = config.SaveTo(newClusterPath)
 	if err != nil {
 		printError("Failed to save cluster config: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -85,7 +86,7 @@ func UpdateCluster() {
 	config, err := cluster.ReadClusterINI(clusterDirPath)
 	if err != nil {
 		printError("Failed to read cluster.ini in " + clusterDirPath)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	updateClusterConfig(config)
 	config.SaveTo(clusterDirPath)

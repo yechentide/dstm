@@ -10,6 +10,7 @@ import (
 	"github.com/yechentide/dstm/config/shard"
 	"github.com/yechentide/dstm/config/world"
 	"github.com/yechentide/dstm/extractor"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/utils"
 	"golang.org/x/exp/slices"
 )
@@ -18,7 +19,7 @@ func selectShard(clusterDirPath string) string {
 	existShards, err := utils.ListShards(clusterDirPath)
 	if err != nil {
 		printError(err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	selected := Selector(existShards, "Please select a shard", false)[0]
 	return selected
@@ -36,11 +37,11 @@ func CreateShard() {
 	jsonExists, err := utils.IsClusterDir(clusterDirPath)
 	if err != nil {
 		printError(err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	if !jsonExists {
 		printError("Not a valid cluster: " + clusterName)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 
 	fmt.Println()
@@ -58,7 +59,7 @@ func CreateShard() {
 		printInfo(msg)
 	} else {
 		printError("can not list shards: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	shardType := Selector([]string{"forest", "cave"}, "Select shard type", false)[0]
 	shardName := "Main"
@@ -76,7 +77,7 @@ func CreateShard() {
 	err = os.Mkdir(shardDir, 0755)
 	if err != nil {
 		printError("Failed to create shard: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 
 	// server.ini
@@ -85,7 +86,7 @@ func CreateShard() {
 	err = config.SaveTo(shardDir)
 	if err != nil {
 		printError("Failed to save shard config: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	// worldgenoverride.lua
 	outputDirPath := viper.GetString("cacheDirPath") + "/json"
@@ -93,25 +94,25 @@ func CreateShard() {
 	jsonExists, err = utils.FileExists(jsonPath)
 	if err != nil {
 		printError("Failed to check json file: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	if !jsonExists {
 		err = extractor.ExtractWorldgenVanillaSettings(viper.GetString("serverRootPath"), outputDirPath)
 		if err != nil {
 			printError("Failed to extract json file: " + err.Error())
-			os.Exit(1)
+			logger.PrintJsonResultAndExit(1)
 		}
 	}
 	override, err := world.MakeDefaultConfig(jsonPath)
 	updateWorldOverride(override, true)
 	if err != nil {
 		printError("Failed to generate worldgenoverride.lua: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	err = override.SaveTo(shardDir)
 	if err != nil {
 		printError("Failed to save worldgenoverride.lua: " + err.Error())
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -123,7 +124,7 @@ func UpdateShard() {
 	config, err := shard.ReadServerINI(shardDirPath, "")
 	if err != nil {
 		printError("Failed to read shard.ini in " + shardDirPath)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	updateShardConfig(config)
 	config.SaveTo(shardDirPath)
@@ -138,7 +139,7 @@ func UpdateWorld() {
 	config, err := world.ReadWorldgenOverride(shardDirPath)
 	if err != nil {
 		printError("Failed to read worldgenoverride.lua in " + shardDirPath)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	updateWorldOverride(config, false)
 	config.SaveTo(shardDirPath)
