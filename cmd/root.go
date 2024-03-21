@@ -37,7 +37,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:     "dstm",
-	Version: "v0.0.1",
+	Version: "v0.1.0",
 	Short:   "Tools for Don't Starve Together Dedicated Server",
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
