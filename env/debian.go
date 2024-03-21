@@ -1,7 +1,6 @@
 package env
 
 import (
-	"errors"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -53,10 +52,11 @@ func (d *DebianHelper) IsInstalled(packages []string) (map[string]bool, error) {
 
 	for _, pkg := range packages {
 		output, err := shell.ExecuteAndGetOutput("grep", "^"+pkg+"$", tmpFilePath)
-		if err != nil {
-			return installed, errors.New("Package '" + pkg + "' not found.")
+		if err == nil {
+			installed[pkg] = output == pkg
+		} else {
+			installed[pkg] = false
 		}
-		installed[pkg] = output == pkg
 	}
 	return installed, nil
 }
