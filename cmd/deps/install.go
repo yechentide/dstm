@@ -2,13 +2,13 @@ package deps
 
 import (
 	"log/slog"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/yechentide/dstm/env"
 	"github.com/yechentide/dstm/global"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/shell"
 )
 
@@ -24,14 +24,14 @@ var installCmd = &cobra.Command{
 			h, err := env.GetOSHelper()
 			if err != nil {
 				slog.Error("Failed to get os helper.", "error", err)
-				os.Exit(1)
+				logger.PrintJsonResultAndExit(1)
 			}
 			helper = h
 		}
 
 		if pkgFlag {
 			installPkgs(args)
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
 		isTerminalMultiplexerReady, err := helper.IsTerminalMultiplexerReady()
@@ -40,7 +40,7 @@ var installCmd = &cobra.Command{
 			if err != nil {
 				slog.Error(err.Error())
 			}
-			os.Exit(1)
+			logger.PrintJsonResultAndExit(1)
 		}
 
 		steamRootPath := viper.GetString("steamRootPath")
@@ -48,22 +48,22 @@ var installCmd = &cobra.Command{
 
 		if steamFlag {
 			prepareSteam(steamRootPath)
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
 		if dstFlag {
 			prepareDSTServer(steamRootPath, serverRootPath)
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
 		if allFlag {
 			installPkgs([]string{})
 			prepareSteam(steamRootPath)
 			prepareDSTServer(steamRootPath, serverRootPath)
-			os.Exit(0)
+			logger.PrintJsonResultAndExit(0)
 		}
 
-		os.Exit(2)
+		logger.PrintJsonResultAndExit(2)
 	},
 }
 
@@ -95,16 +95,16 @@ func installPkgs(packages []string) {
 		err = helper.InstallPackages(packages, password)
 	}
 	if err != nil {
-		slog.Error("Failed to install required packages", err)
-		os.Exit(1)
+		slog.Error("Failed to install required packages", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
 func checkTmuxSession(sessionName string) bool {
 	sessionExists, err := shell.HasTmuxSession(sessionName)
 	if err != nil {
-		slog.Error("Failed to check tmux session", err)
-		os.Exit(1)
+		slog.Error("Failed to check tmux session", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	return sessionExists
 }
@@ -126,7 +126,7 @@ func waitForCompletion(sessionName string, checkFunc func() bool) bool {
 func checkSteamRoot(steamRootPath string) {
 	if steamRootPath == "" {
 		slog.Error("Please use --steam-root-path flag or config file to specify steam root directory")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -139,13 +139,13 @@ func prepareSteam(steamRootPath string) {
 	checkSteamRoot(steamRootPath)
 	err := env.PrepareLatestSteam(steamRootPath)
 	if err != nil {
-		slog.Error("Failed to prepare steam", err)
-		os.Exit(1)
+		slog.Error("Failed to prepare steam", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	steamOK := waitForCompletion(global.SESSION_STEAM_INSTALL, checkSteamAvailable(steamRootPath))
 	if !steamOK {
 		slog.Error("Steam installation failed")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -153,8 +153,8 @@ func checkSteamAvailable(steamRootPath string) func() bool {
 	return func() bool {
 		steamOK, err := env.IsSteamAvailable(steamRootPath)
 		if err != nil {
-			slog.Error("Failed to check steam availability", err)
-			os.Exit(1)
+			slog.Error("Failed to check steam availability", "error", err)
+			logger.PrintJsonResultAndExit(1)
 		}
 		return steamOK
 	}
@@ -166,7 +166,7 @@ func checkSteamAvailable(steamRootPath string) func() bool {
 func checkServerRoot(serverRootPath string) {
 	if serverRootPath == "" {
 		slog.Error("Please use --server-root-path flag or config file to specify dst root directory")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -174,8 +174,8 @@ func checkDSTAvailable(serverRootPath string) func() bool {
 	return func() bool {
 		dstOK, err := env.IsDSTServerAvailable(serverRootPath)
 		if err != nil {
-			slog.Error("Failed to check dst availability", err)
-			os.Exit(1)
+			slog.Error("Failed to check dst availability", "error", err)
+			logger.PrintJsonResultAndExit(1)
 		}
 		return dstOK
 	}
@@ -191,17 +191,17 @@ func prepareDSTServer(steamRootPath, serverRootPath string) {
 	steamOK := checkSteamAvailable(steamRootPath)()
 	if !steamOK {
 		slog.Error("Steam installation failed")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	checkServerRoot(serverRootPath)
 	err := env.PrepareLatestDSTServer(steamRootPath, serverRootPath, "")
 	if err != nil {
-		slog.Error("Failed to prepare dst server", err)
-		os.Exit(1)
+		slog.Error("Failed to prepare dst server", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	dstOK := waitForCompletion(global.SESSION_DST_INSTALL, checkDSTAvailable(serverRootPath))
 	if !dstOK {
 		slog.Error("DST installation failed")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 }

@@ -82,6 +82,7 @@ func executeLuaScriptToExtractSettings(luaScriptsDirPath, unzippedScriptsDir, ou
 	if !exists {
 		return errors.New("failed to extract settings")
 	}
+
 	slog.Info("Worldgen vanilla settings extracted to " + outputDirPath)
 	return nil
 }

@@ -33,7 +33,7 @@ import (
 	"github.com/yechentide/dstm/cmd/deps"
 	"github.com/yechentide/dstm/cmd/extract"
 	"github.com/yechentide/dstm/cmd/server"
-	"github.com/yechentide/dstm/global"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/utils"
 )
 
@@ -43,7 +43,7 @@ var rootCmd = &cobra.Command{
 	Short:   "Tools for Don't Starve Together Dedicated Server",
 	Long:    "Tools for Don't Starve Together Dedicated Server.",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		global.InitCustomLogLevelAndFormat()
+		logger.InitCustomLogLevelAndFormat()
 		expandPaths()
 		debugConfig()
 	},
@@ -55,7 +55,8 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		os.Exit(1)
+		slog.Error(err.Error())
+		logger.PrintJsonResultAndExit(1)
 	}
 }
 
@@ -71,11 +72,20 @@ func addFlags() {
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SetVersionTemplate("(*•ᴗ•*) " + rootCmd.Use + " " + rootCmd.Version + "\n")
 
-	rootCmd.PersistentFlags().Bool("no-color", false, "disable color")
+	rootCmd.PersistentFlags().Bool("hide-timestamp", false, "hide timestamp")
+	viper.BindPFlag("hideTimestamp", rootCmd.PersistentFlags().Lookup("hide-timestamp"))
+
+	rootCmd.PersistentFlags().Bool("hide-prefix", false, "hide prefix")
+	viper.BindPFlag("hidePrefix", rootCmd.PersistentFlags().Lookup("hide-prefix"))
+
+	rootCmd.PersistentFlags().Bool("no-color", false, "no color")
 	viper.BindPFlag("noColor", rootCmd.PersistentFlags().Lookup("no-color"))
 
 	rootCmd.PersistentFlags().String("log-level", "info", "change log error")
 	viper.BindPFlag("logLevel", rootCmd.PersistentFlags().Lookup("log-level"))
+
+	rootCmd.PersistentFlags().Bool("json", false, "output in json format")
+	viper.BindPFlag("json", rootCmd.PersistentFlags().Lookup("json"))
 
 	rootCmd.PersistentFlags().String("cache-dir-path", "$HOME/.cache/dstm", "path of cache directory")
 	viper.BindPFlag("cacheDirPath", rootCmd.PersistentFlags().Lookup("cache-dir-path"))
@@ -105,8 +115,11 @@ func addCommands() {
 }
 
 func initConfig() {
+	viper.SetDefault("hideTimestamp", false)
+	viper.SetDefault("hidePrefix", false)
 	viper.SetDefault("noColor", false)
 	viper.SetDefault("logLevel", "info")
+	viper.SetDefault("json", false)
 	viper.SetDefault("cacheDirPath", "$HOME/.cache/dstm")
 	viper.SetDefault("steamRootPath", "$HOME/Steam")
 	viper.SetDefault("serverRootPath", "$HOME/DST/Server")
@@ -145,8 +158,11 @@ func expandPaths() {
 
 func debugConfig() {
 	slog.Debug("========== ========== ========== =========")
+	slog.Debug("hideTimestamp: " + strconv.FormatBool(viper.GetBool("hideTimestamp")))
+	slog.Debug("hidePrefix: " + strconv.FormatBool(viper.GetBool("hidePrefix")))
 	slog.Debug("noColor: " + strconv.FormatBool(viper.GetBool("noColor")))
 	slog.Debug("logLevel: " + viper.GetString("logLevel"))
+	slog.Debug("json: " + strconv.FormatBool(viper.GetBool("json")))
 	slog.Debug("cacheDirPath: " + viper.GetString("cacheDirPath"))
 	slog.Debug("steamRootPath: " + viper.GetString("steamRootPath"))
 	slog.Debug("serverRootPath: " + viper.GetString("serverRootPath"))

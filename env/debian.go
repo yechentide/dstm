@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/yechentide/dstm/global"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/shell"
 	"golang.org/x/exp/slices"
 )
@@ -17,8 +18,8 @@ type DebianHelper struct{}
 func (d *DebianHelper) IsRoot() bool {
 	currentUser, err := user.Current()
 	if err != nil {
-		slog.Error("Failed to get current user", err)
-		os.Exit(1)
+		slog.Error("Failed to get current user", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	return currentUser.Username == "root"
 }
@@ -26,8 +27,8 @@ func (d *DebianHelper) IsRoot() bool {
 func (d *DebianHelper) HasSudoPermmission() bool {
 	output, err := shell.ExecuteAndGetOutput("groups")
 	if err != nil {
-		slog.Error("Failed to get groups", err)
-		os.Exit(1)
+		slog.Error("Failed to get groups", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	groups := strings.Split(output, " ")
 	return slices.Contains(groups, "sudo")
@@ -76,7 +77,7 @@ func (d *DebianHelper) IsTerminalMultiplexerReady() (bool, error) {
 func (d *DebianHelper) InstallPackages(packages []string, password string) error {
 	if !d.IsRoot() && !d.HasSudoPermmission() {
 		slog.Error("You must have sudo permission to install packages")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	cmdString := "apt install -y " + strings.Join(packages, " ")
 	var cmd *exec.Cmd

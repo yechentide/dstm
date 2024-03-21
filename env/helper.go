@@ -3,9 +3,9 @@ package env
 import (
 	"errors"
 	"log/slog"
-	"os"
 	"runtime"
 
+	"github.com/yechentide/dstm/logger"
 	"gopkg.in/ini.v1"
 )
 
@@ -23,13 +23,13 @@ func checkOS() {
 	current := runtime.GOOS
 	if runtime.GOOS != "linux" {
 		slog.Error("Unsupported OS: " + current)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 
 	osInfo, err := ini.Load("/etc/os-release")
 	if err != nil {
-		slog.Error("Failed to load /etc/os-release", err)
-		os.Exit(1)
+		slog.Error("Failed to load /etc/os-release", "error", err)
+		logger.PrintJsonResultAndExit(1)
 	}
 	distroID := osInfo.Section("").Key("ID").String()
 	value, found := supportedOS[distroID]
@@ -37,7 +37,7 @@ func checkOS() {
 		slog.Debug("Detected distro: " + distroID)
 	} else {
 		slog.Error("Unsupported distro: " + distroID)
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	osDistro = value
 	// osVer = osInfo.Section("").Key("VERSION_ID").String()

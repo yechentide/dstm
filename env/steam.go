@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/yechentide/dstm/global"
+	"github.com/yechentide/dstm/logger"
 	"github.com/yechentide/dstm/shell"
 	"github.com/yechentide/dstm/utils"
 	"golang.org/x/exp/slices"
@@ -41,7 +42,7 @@ func downloadSteamScript(steamRootPath string) error {
 	containsScript := slices.Contains(extracted, "steamcmd.sh")
 	if !containsScript {
 		slog.Error("Failed to extract steamcmd.sh")
-		os.Exit(1)
+		logger.PrintJsonResultAndExit(1)
 	}
 	return nil
 }

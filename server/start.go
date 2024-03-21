@@ -18,7 +18,7 @@ func StartShard(clusterName, shardName string, skipModUpdate bool) error {
 		return err
 	}
 	if exists {
-		slog.Info("Shard already running")
+		slog.Info("Shard " + sessionName + " already running")
 		return nil
 	}
 
@@ -56,7 +56,7 @@ func StartShard(clusterName, shardName string, skipModUpdate bool) error {
 			return err
 		}
 		if ok {
-			slog.Info("Shard started: " + sessionName)
+			// slog.Info("Shard started: " + sessionName)
 			return nil
 		}
 	}

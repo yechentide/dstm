@@ -35,7 +35,7 @@ func ListAllClusters(worldsDirPath string) ([]string, error) {
 		path := worldsDirPath + "/" + dirName
 		isCluster, err := IsClusterDir(path)
 		if err != nil {
-			slog.Warn("Something went wrong.", "error", err)
+			slog.Warn(err.Error())
 			continue
 		}
 		if isCluster {
@@ -56,7 +56,7 @@ func ListShards(clusterDirPath string) ([]string, error) {
 		path := clusterDirPath + "/" + dirName
 		isShard, err := IsShardDir(path)
 		if err != nil {
-			slog.Warn("Something went wrong.", "error", err)
+			// slog.Warn("Something went wrong.", "error", err)
 			continue
 		}
 		if isShard {
